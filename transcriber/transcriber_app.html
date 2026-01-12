@@ -1,0 +1,98 @@
+<!--
+INSTRUCTIONS:
+1. Open a terminal and run:
+      source ../venv/bin/activate
+      python transcriber_server.py
+2. Open this HTML file in your browser (or go to http://127.0.0.1:5000/)
+3. Upload your video, set options, and click "Transcribe"
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Transcriber</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f7f7f7; }
+    .container { background: #fff; padding: 2em; border-radius: 8px; max-width: 600px; margin: auto; }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 1em; }
+    input, select, button { width: 100%; padding: 0.5em; margin-top: 0.5em; }
+    #progress { margin: 1em 0; }
+    #transcript { white-space: pre-wrap; background: #f0f0f0; padding: 1em; border-radius: 6px; margin-top: 1em; }
+    .instructions { background: #e0e0e0; padding: 1em; border-radius: 6px; margin-bottom: 2em; font-size: 0.95em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="instructions">
+      <b>How to use:</b><br>
+      1. In a terminal, run:<br>
+      <code>source ../venv/bin/activate</code><br>
+      <code>python transcriber_server.py</code><br>
+      2. Open this HTML file in your browser (or go to <a href="http://127.0.0.1:5000/" target="_blank">http://127.0.0.1:5000/</a>)<br>
+      3. Upload your video, set options, and click <b>Transcribe</b>!
+    </div>
+    <h1>Video Transcriber</h1>
+    <form id="transcribeForm">
+      <label>Video File:
+        <input type="file" name="file" required accept="video/*">
+      </label>
+      <label>Language:
+        <select name="language">
+          <option value="en-EN">English (UK)</option>
+          <option value="en-US">English (US)</option>
+          <option value="es-ES">Spanish</option>
+          <option value="fr-FR">French</option>
+          <option value="de-DE">German</option>
+          <option value="it-IT">Italian</option>
+          <option value="pt-BR">Portuguese (Brazil)</option>
+          <option value="ja-JP">Japanese</option>
+          <option value="ko-KR">Korean</option>
+          <option value="zh-CN">Chinese (Simplified)</option>
+        </select>
+      </label>
+      <label>Noise Reduction:
+        <select name="noise">
+          <option value="1">Basic (recommended)</option>
+          <option value="2">Massive</option>
+        </select>
+      </label>
+      <label>Volume Boost (0.1 to 3.0, optional):
+        <input type="number" step="0.1" min="0.1" max="3.0" name="volume">
+      </label>
+      <button type="submit">Transcribe</button>
+    </form>
+    <div id="progress"></div>
+    <div id="transcript"></div>
+  </div>
+  <script>
+    const form = document.getElementById('transcribeForm');
+    const progress = document.getElementById('progress');
+    const transcriptDiv = document.getElementById('transcript');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      progress.textContent = 'Uploading and transcribing... (this may take a while)';
+      transcriptDiv.textContent = '';
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/transcribe', {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          progress.textContent = 'Error: ' + (err.error || response.statusText);
+          return;
+        }
+        const data = await response.json();
+        progress.textContent = 'Done!';
+        transcriptDiv.textContent = data.transcript;
+      } catch (err) {
+        progress.textContent = 'Error: ' + err;
+      }
+    };
+  </script>
+</body>
+</html> 
