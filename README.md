@@ -14,7 +14,7 @@ A web-based application that helps Business Analysts generate tailored prompts f
 
    ```bash
    # Navigate to the project directory
-   cd ~/ba-prompt-builder
+   cd ~/sonarvision
 
    # Open in your browser
    open index.html
@@ -39,7 +39,7 @@ A web-based application that helps Business Analysts generate tailored prompts f
 
    ```bash
    # Navigate to the project directory
-   cd ~/ba-prompt-builder
+   cd ~/sonarvision
 
    # Run the startup script (installs dependencies automatically)
    ./start_servers.sh
@@ -120,8 +120,6 @@ SonarVision includes a fully embedded JIRA Analytics Dashboard for real-time pro
 - **Purpose:** UI/UX design and user flow planning
 - **Inputs:** Target users, key screens, main flows, design constraints, wireframe type
 - **Output:** Wireframing guidance and best practices
-- **🎨 Figma Integration:** Create draft wireframes directly in Figma with basic layouts and placeholders
-
 ### 4. User Stories Phase
 
 - **Purpose:** Creating detailed user stories and acceptance criteria
@@ -192,71 +190,15 @@ SonarVision includes a fully embedded JIRA Analytics Dashboard for real-time pro
 - **Dynamic Forms:** Form fields change based on selected phase
 - **GPT Integration:** Execute prompts directly with OpenAI's GPT models
 - **Video Transcription:** Free local transcription of MP4, MOV, AVI, MKV, and WEBM video files (no API costs!)
-- **🎨 Figma Integration:** Create draft wireframes directly in Figma using the API
 - **Copy to Clipboard:** One-click prompt and response copying
 - **Toast Notifications:** Feedback for user actions
 - **Form Validation:** Ensures all required fields are completed
 - **Local Storage:** API keys stored securely in your browser
 
-## 🎨 Figma Integration
-
-SonarVision now includes powerful Figma integration that can automatically create draft wireframes based on your requirements.
-
-### How It Works
-
-1. **Select Wireframing Phase:** Choose the Wireframing phase from the main menu
-2. **Fill in Requirements:** Provide details about your target users, key screens, and user flows
-3. **Choose Integration:** Select "Create draft wireframes in Figma" from the dropdown
-4. **Add API Key:** Enter your Figma API key (see setup instructions below)
-5. **Generate:** Click "Generate Prompt" to create both the guidance and the Figma wireframes
-
-### Setting Up Figma API Access
-
-1. **Get Your API Key:**
-
-   - Go to [Figma API Settings](https://www.figma.com/developers/api#access-tokens)
-   - Click "Get personal access token"
-   - Copy the generated token
-
-2. **Use in SonarVision:**
-   - Your API key is stored locally in your browser
-   - Never shared or transmitted to external servers
-   - Required only when creating Figma wireframes
-
-### What Gets Created
-
-When you generate wireframes, SonarVision will:
-
-- **Create a new Figma file** with your specified name
-- **Generate wireframe frames** for each screen you listed
-- **Add basic layouts** with header, content, and footer areas
-- **Include placeholders** for content and navigation
-- **Provide a direct link** to open the file in Figma
-- **Auto-open the file** in a new browser tab
-
-### Wireframe Structure
-
-Each generated wireframe includes:
-
-- **Header area** with screen name
-- **Content area** with placeholder text
-- **Footer area** for navigation or actions
-- **Proper spacing and padding** for mobile-first design
-- **Clean, minimal styling** ready for customization
-
-### Next Steps After Generation
-
-1. **Open the Figma file** using the provided link
-2. **Customize layouts** with your specific content
-3. **Add interactions** and annotations as needed
-4. **Share with stakeholders** for feedback
-5. **Iterate and refine** based on feedback
-
 ## 🔧 Technical Details
 
 - **Pure HTML/CSS/JavaScript:** No frameworks or build process required
 - **OpenAI API Integration:** Direct connection to GPT models
-- **Figma REST API Integration:** Direct connection to create files and frames
 - **Local Storage:** API keys stored securely in your browser
 - **Cross-Platform:** Works on any modern browser
 - **Offline Capable:** Basic functionality works without internet (GPT features require connection)
@@ -264,7 +206,7 @@ Each generated wireframe includes:
 ## 📁 File Structure
 
 ```
-ba-prompt-builder/
+sonarvision/
 ├── index.html              # Main application file
 ├── styles.css              # Styling and responsive design
 ├── script.js               # Application logic and functionality
@@ -451,7 +393,3 @@ This project is open source and available under the MIT License.
 ---
 
 **Ready to streamline your BA workflow? Open `index.html` and start generating tailored prompts!** 🚀
-# sonarvision
-# sonarvision
-# sonarvision
-# sonarvision
