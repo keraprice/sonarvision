@@ -1043,9 +1043,6 @@
                 <button class="btn btn-primary btn-sm" onclick="startNewProjectFlow()">
                   <i class="fas fa-plus"></i> New Project
                 </button>
-                <button class="btn btn-secondary btn-sm" onclick="openProjectManager()">
-                  <i class="fas fa-folder-open"></i> Manage
-                </button>
               </div>
             </div>
           </div>
@@ -1316,77 +1313,93 @@
         <div class="modal-body">
           <div class="projects-layout-simple">
             <div class="projects-editor-simple">
-              <div class="form-group">
-                <label for="project-name-input">Project name</label>
-                <input type="text" id="project-name-input" class="form-control" placeholder="e.g., Customer Portal Revamp" />
+              <div class="pm-section">
+                <div class="pm-section-header">
+                  <h4>Project Details</h4>
+                  <p>Update the core project info that can be reused across phases.</p>
+                </div>
+                <div class="form-group">
+                  <label for="project-name-input">Project name</label>
+                  <input type="text" id="project-name-input" class="form-control" placeholder="e.g., Customer Portal Revamp" />
+                </div>
+                <div class="form-group">
+                  <label for="project-description-input">Description</label>
+                  <textarea id="project-description-input" class="form-control" rows="3" placeholder="High-level description"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="project-stakeholders-input">Key stakeholders (comma separated)</label>
+                  <input type="text" id="project-stakeholders-input" class="form-control" placeholder="Names or roles" />
+                </div>
+                <div class="form-group">
+                  <label for="project-team-input">Team members (name - role, comma separated)</label>
+                  <input type="text" id="project-team-input" class="form-control" placeholder="Jane Doe - PO, Sam Wu - Eng" />
+                </div>
+                <div class="form-group">
+                  <label for="project-roles-input">Default user roles (comma separated)</label>
+                  <input type="text" id="project-roles-input" class="form-control" placeholder="Admin, Customer, Support Agent" />
+                </div>
+                <div class="form-group">
+                  <label for="project-acstyle-input">Default acceptance criteria style</label>
+                  <input type="text" id="project-acstyle-input" class="form-control" placeholder="Gherkin, bullet list, etc." />
+                </div>
+                <div class="pm-actions">
+                  <button class="btn btn-primary btn-sm" onclick="saveProject(); return false;">
+                    <i class="fas fa-save"></i> Save Project
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteProject(); return false;">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="project-description-input">Description</label>
-                <textarea id="project-description-input" class="form-control" rows="3" placeholder="High-level description"></textarea>
-              </div>
-              <div class="form-group">
-                <label for="project-stakeholders-input">Key stakeholders (comma separated)</label>
-                <input type="text" id="project-stakeholders-input" class="form-control" placeholder="Names or roles" />
-              </div>
-              <div class="form-group">
-                <label for="project-team-input">Team members (name - role, comma separated)</label>
-                <input type="text" id="project-team-input" class="form-control" placeholder="Jane Doe - PO, Sam Wu - Eng" />
-              </div>
-              <div class="form-group">
-                <label for="project-roles-input">Default user roles (comma separated)</label>
-                <input type="text" id="project-roles-input" class="form-control" placeholder="Admin, Customer, Support Agent" />
-              </div>
-              <div class="form-group">
-                <label for="project-acstyle-input">Default acceptance criteria style</label>
-                <input type="text" id="project-acstyle-input" class="form-control" placeholder="Gherkin, bullet list, etc." />
-              </div>
-              <div class="form-group">
-                <label for="project-response-preview">Saved responses by phase/feature</label>
+
+              <div class="pm-section">
+                <div class="pm-section-header">
+                  <h4>Saved Responses</h4>
+                  <p>Previously saved phase outputs for quick reference.</p>
+                </div>
                 <div id="project-response-preview" class="response-preview"></div>
               </div>
-              <div class="project-actions-simple">
-                <button class="btn btn-primary btn-sm" onclick="saveProject(); return false;">
-                  <i class="fas fa-save"></i> Save Project
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="deleteProject(); return false;">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
+
+              <div class="pm-section">
+                <div class="pm-section-header">
+                  <h4>Features</h4>
+                  <p>Pick a saved feature or edit its details below.</p>
+                </div>
+                <div id="features-list" class="projects-list-simple pm-list"></div>
+                <div class="pm-feature-divider"></div>
+                <div class="form-group">
+                  <label for="feature-name-input">Feature name</label>
+                  <input type="text" id="feature-name-input" class="form-control" placeholder="e.g., Payments" />
+                </div>
+                <div class="form-group">
+                  <label for="feature-size-input">T-shirt size</label>
+                  <select id="feature-size-input" class="form-control">
+                    <option value="">Select size</option>
+                    <option value="Small">Small</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large">Large</option>
+                    <option value="Extra Large">Extra Large</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="feature-desc-input">Feature description</label>
+                  <textarea id="feature-desc-input" class="form-control" rows="2" placeholder="Short summary"></textarea>
+                </div>
+                <div class="pm-actions pm-actions--sticky">
+                  <button class="btn btn-secondary btn-sm" onclick="startNewFeature(); return false;">
+                    <i class="fas fa-plus"></i> New Feature
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="clearFeatureForm(); return false;">
+                    Clear Feature
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteFeatureEntry(); return false;">
+                    Delete Feature
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="saveFeature(); return false;">
+                    <i class="fas fa-save"></i> Save Feature
+                  </button>
+                </div>
               </div>
-              <hr />
-              <h4>Features</h4>
-              <div class="form-group">
-                <label for="feature-name-input">Feature name</label>
-                <input type="text" id="feature-name-input" class="form-control" placeholder="e.g., Payments" />
-              </div>
-              <div class="form-group">
-                <label for="feature-size-input">T-shirt size</label>
-                <select id="feature-size-input" class="form-control">
-                  <option value="">Select size</option>
-                  <option value="Small">Small</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Large">Large</option>
-                  <option value="Extra Large">Extra Large</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="feature-desc-input">Feature description</label>
-                <textarea id="feature-desc-input" class="form-control" rows="2" placeholder="Short summary"></textarea>
-              </div>
-              <div class="project-actions-simple">
-                <button class="btn btn-secondary btn-sm" onclick="startNewFeature(); return false;">
-                  <i class="fas fa-plus"></i> New Feature
-                </button>
-                <button class="btn btn-secondary btn-sm" onclick="clearFeatureForm(); return false;">
-                  Clear Feature
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="deleteFeatureEntry(); return false;">
-                  Delete Feature
-                </button>
-                <button class="btn btn-primary btn-sm" onclick="saveFeature(); return false;">
-                  <i class="fas fa-save"></i> Save Feature
-                </button>
-              </div>
-              <div id="features-list" class="projects-list-simple" style="margin-top:12px;"></div>
             </div>
           </div>
         </div>

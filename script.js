@@ -47,9 +47,16 @@ const FIELD_SEMANTIC_MAP = {
 };
 
 function getFormFieldsRoot() {
+  const activeScreen = document.querySelector(".screen.active");
+  if (activeScreen) {
+    const withinActive = activeScreen.querySelector(
+      "#form-fields, #dynamic-form-fields"
+    );
+    if (withinActive) return withinActive;
+  }
   return (
-    document.getElementById("dynamic-form-fields") ||
-    document.getElementById("form-fields")
+    document.getElementById("form-fields") ||
+    document.getElementById("dynamic-form-fields")
   );
 }
 
@@ -4847,12 +4854,16 @@ function renderFeatureOptions() {
       list.forEach((f) => {
         const div = document.createElement("div");
         div.className = "projects-list-simple-item";
+        if (String(f.id) === String(activeFeatureId)) {
+          div.classList.add("active");
+        }
         div.textContent = f.name;
         div.onclick = () => {
           activeFeatureId = String(f.id);
           localStorage.setItem("active_feature_id", activeFeatureId);
           if (select) select.value = activeFeatureId;
           populateFeatureForm(f);
+          renderFeatureOptions();
         };
         featureListDiv.appendChild(div);
       });
@@ -4911,14 +4922,6 @@ function renderProjectsOverview() {
     const actions = document.createElement("div");
     actions.className = "project-actions-simple";
 
-    const selectBtn = document.createElement("button");
-    selectBtn.className = "btn btn-secondary btn-sm";
-    selectBtn.textContent = "Select";
-    selectBtn.onclick = () => {
-      setActiveProject(p.id);
-      showToast(`Selected project: ${p.name}`, "success");
-    };
-
     const manageBtn = document.createElement("button");
     manageBtn.className = "btn btn-primary btn-sm";
     manageBtn.textContent = "Manage";
@@ -4935,7 +4938,6 @@ function renderProjectsOverview() {
       selectPhase("discovery");
     };
 
-    actions.appendChild(selectBtn);
     actions.appendChild(manageBtn);
     actions.appendChild(discoveryBtn);
 
@@ -6177,11 +6179,22 @@ async function deleteUserConfirm(userId, username) {
 }
 
 // ---- Unified prefill override ----
-function prefillFromProject() {
+async function prefillFromProject() {
   const phaseKey =
     currentPhase ||
     document.getElementById("phase-select")?.value ||
     "discovery";
+  if (activeProjectId) {
+    const existing = projectCache.find(
+      (p) => String(p.id) === String(activeProjectId)
+    );
+    if (!existing) {
+      await loadProjects();
+    }
+    if (!featureCache[activeProjectId]) {
+      await loadFeaturesForProject(activeProjectId);
+    }
+  }
   const proj = projectCache.find(
     (p) => String(p.id) === String(activeProjectId)
   );
@@ -6202,20 +6215,19 @@ function prefillFromProject() {
   const projectPhaseData = projDetails?.phaseData || {};
   const projectGeneral = projDetails?.general || {};
 
-  const formFields =
-    document.getElementById("dynamic-form-fields") ||
-    document.getElementById("form-fields");
-  const map = buildSemanticMap(phaseKey);
-  if (!formFields || !map || Object.keys(map).length === 0) {
-    showToast("No mappable fields found for this phase", "info");
+  const formFields = getFormFieldsRoot();
+  if (!formFields) {
+    showToast("No form fields found for this phase", "info");
     return;
   }
 
   // Apply saved phase data first (feature preferred)
   const phaseValues =
     featurePhaseData[phaseKey] || projectPhaseData[phaseKey] || {};
+  let applied = false;
   if (phaseValues && Object.keys(phaseValues).length > 0) {
     applyRawFormValues(phaseValues);
+    applied = true;
   }
 
   const savedResponse =
@@ -6245,38 +6257,38 @@ function prefillFromProject() {
     return false;
   };
   if (phaseKey === "discovery") {
-    setIfEmpty("teamMembers", projectGeneral.teamMembers);
-    setIfEmpty("stakeholders", projectGeneral.stakeholders);
-    setIfEmpty(
+    applied = setIfEmpty("teamMembers", projectGeneral.teamMembers) || applied;
+    applied = setIfEmpty("stakeholders", projectGeneral.stakeholders) || applied;
+    applied = setIfEmpty(
       "featureDescription",
       featureGeneral.description || featureGeneral.overview || projectGeneral.overview
-    );
-    setIfEmpty(
+    ) || applied;
+    applied = setIfEmpty(
       "featureSize",
       featureGeneral.tShirtSize ||
         featureGeneral.size ||
         projectGeneral.tShirtSize ||
         projectGeneral.size
-    );
-    setIfEmpty("business-objectives", projectGeneral.goals);
+    ) || applied;
+    applied = setIfEmpty("business-objectives", projectGeneral.goals) || applied;
   }
   if (phaseKey === "stories") {
-    setIfEmpty("epicName", featureGeneral.name || projectGeneral.name);
-    setIfEmpty(
+    applied = setIfEmpty("epicName", featureGeneral.name || projectGeneral.name) || applied;
+    applied = setIfEmpty(
       "storyDetails",
       featureGeneral.description || featureGeneral.overview || projectGeneral.overview
-    );
-    setIfEmpty("userRoles", projectGeneral.roles);
-    setIfEmpty("acceptanceCriteria", projectGeneral.acStyle);
+    ) || applied;
+    applied = setIfEmpty("userRoles", projectGeneral.roles) || applied;
+    applied = setIfEmpty("acceptanceCriteria", projectGeneral.acStyle) || applied;
   }
   if (phaseKey === "requirements") {
-    setIfEmpty("projectName", projectGeneral.name);
-    setIfEmpty("businessGoals", projectGeneral.goals);
-    setIfEmpty("userTypes", projectGeneral.roles);
-    setIfEmpty("constraints", projectGeneral.issues);
-    setIfEmpty("acceptanceCriteria", projectGeneral.acStyle);
-    setIfEmpty("meetingObjectives", projectGeneral.goals);
-    setIfEmpty("meetingAttendees", projectGeneral.teamMembers);
+    applied = setIfEmpty("projectName", projectGeneral.name) || applied;
+    applied = setIfEmpty("businessGoals", projectGeneral.goals) || applied;
+    applied = setIfEmpty("userTypes", projectGeneral.roles) || applied;
+    applied = setIfEmpty("constraints", projectGeneral.issues) || applied;
+    applied = setIfEmpty("acceptanceCriteria", projectGeneral.acStyle) || applied;
+    applied = setIfEmpty("meetingObjectives", projectGeneral.goals) || applied;
+    applied = setIfEmpty("meetingAttendees", projectGeneral.teamMembers) || applied;
   }
 
   const getVal = (meta, fieldKey) => {
@@ -6301,18 +6313,20 @@ function prefillFromProject() {
     return "";
   };
 
-  let applied = false;
-  Object.entries(map).forEach(([fieldKey, meta]) => {
-    let targetEl =
-      formFields.querySelector(`#${fieldKey}`) ||
-      formFields.querySelector(`[name="${fieldKey}"]`);
-    if (!targetEl) return;
-    if (targetEl.value && targetEl.value.trim() !== "") return;
-    const val = getVal(meta, fieldKey);
-    if (!val) return;
-    setFieldValue(fieldKey, targetEl, val);
-    applied = true;
-  });
+  const map = buildSemanticMap(phaseKey);
+  if (map && Object.keys(map).length > 0) {
+    Object.entries(map).forEach(([fieldKey, meta]) => {
+      let targetEl =
+        formFields.querySelector(`#${fieldKey}`) ||
+        formFields.querySelector(`[name="${fieldKey}"]`);
+      if (!targetEl) return;
+      if (targetEl.value && targetEl.value.trim() !== "") return;
+      const val = getVal(meta, fieldKey);
+      if (!val) return;
+      setFieldValue(fieldKey, targetEl, val);
+      applied = true;
+    });
+  }
 
   // Fallback: generic mapping/heuristic to catch unmapped fields
   if (!applied) {

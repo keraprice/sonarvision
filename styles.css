@@ -953,12 +953,36 @@ body.theme-dark::before {
 
 /* Projects screen */
 .projects-screen-header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   margin-bottom: 16px;
 }
 
+.projects-screen-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.projects-screen-actions .project-actions-simple {
+  justify-content: center;
+}
+
+.projects-screen-header .back-btn {
+  justify-self: start;
+}
+
+.projects-screen-header .projects-screen-actions {
+  justify-self: center;
+  text-align: center;
+}
+
+.projects-screen-header::after {
+  content: "";
+  justify-self: end;
+}
 .projects-screen-actions h2 {
   margin: 0;
 }
@@ -1026,11 +1050,11 @@ body.theme-dark::before {
 }
 
 .projects-editor-simple {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: var(--shadow-soft);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
   color: var(--text-primary);
 }
 
@@ -1041,11 +1065,15 @@ body.theme-dark::before {
   margin-bottom: 8px;
   cursor: pointer;
   color: var(--text-primary);
-  display: none;
+  display: block;
 }
 
 .projects-list-simple-item:hover {
   background: var(--surface-subtle);
+}
+.projects-list-simple-item.active {
+  border-color: var(--brand-primary);
+  background: rgba(47, 109, 255, 0.12);
 }
 
 .suggestion-banner {
@@ -1120,7 +1148,7 @@ body.theme-dark::before {
 
 .projects-layout-simple {
   display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
@@ -1130,6 +1158,10 @@ body.theme-dark::before {
   border-radius: 12px;
   padding: 16px;
   box-shadow: var(--shadow-soft);
+}
+
+#projects-list {
+  display: none;
 }
 
 .projects-editor-simple {
@@ -2342,7 +2374,7 @@ input[type="password"]::placeholder {
   min-height: 100vh;
   position: relative;
   width: 100%;
-  z-index: 1000;
+  z-index: 2000;
   overflow-y: auto;
 }
 #interactive-workflow-screen::before {
@@ -3200,7 +3232,7 @@ body.theme-dark .settings-btn i {
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
-  z-index: 1000;
+  z-index: 3000;
   justify-content: center;
   align-items: center;
 }
@@ -3216,12 +3248,67 @@ body.theme-dark .settings-btn i {
   animation: modalSlideIn 0.3s ease-out;
 }
 .project-manager-modal {
-  max-width: 960px;
+  max-width: 1100px;
   width: 96%;
 }
 .project-manager-modal .modal-body {
-  max-height: 70vh;
+  max-height: 80vh;
   overflow-y: auto;
+}
+.project-manager-modal .projects-editor-simple {
+  max-height: 72vh;
+  overflow-y: auto;
+  padding-bottom: 16px;
+}
+.pm-section {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 16px;
+}
+.pm-section-header h4 {
+  margin: 0 0 4px 0;
+}
+.pm-section-header p {
+  margin: 0 0 12px 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.pm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.pm-actions--sticky {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  padding: 12px 0 6px;
+  border-top: 1px solid var(--border-light);
+  z-index: 1;
+}
+.pm-list {
+  margin-top: 8px;
+}
+.pm-feature-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 16px 0;
+}
+.project-manager-modal #features-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.project-manager-modal .project-actions-simple {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  padding: 12px 0 6px;
+  border-top: 1px solid var(--border-light);
+  z-index: 1;
 }
 .project-manager-modal .form-control,
 .project-manager-modal label,
@@ -4051,17 +4138,21 @@ body.theme-dark .error-message {
   background: var(--surface-subtle);
   border-color: var(--border-strong);
 }
+#user-menu {
+  position: relative;
+  z-index: 2;
+}
 .user-dropdown {
   position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
+  top: calc(100% + 8px);
+  left: 0;
+  right: auto;
   background: var(--surface);
   border: 1px solid var(--border-light);
   border-radius: 8px;
   box-shadow: var(--shadow-soft);
   min-width: 200px;
-  z-index: 1000;
+  z-index: 1200;
   overflow: hidden;
 }
 .user-dropdown a {
@@ -4082,6 +4173,7 @@ body.theme-dark .error-message {
   align-items: center;
   gap: 12px;
   position: relative;
+  z-index: 2;
 }
 /* User Management Styles */
 .user-management-container {
