@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SonarVision - Business Analysis Intelligence</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body class="theme-light">
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <div
+            class="logo-container"
+            onclick="returnToDashboard()"
+            title="Return to Dashboard"
+          >
+            <div class="logo-icon">
+              <img
+                src="sv_dolphin_icon.png"
+                alt="Dolphin Logo"
+                style="width: 40px; height: 40px"
+              />
+            </div>
+            <div class="logo-text">
+              <h1 class="app-title">SonarVision</h1>
+              <p class="app-subtitle">From scope to shore, we see it all</p>
+            </div>
+          </div>
+          <p class="app-description">
+            Business Analysis Intelligence - Navigate complex projects with
+            precision and clarity
+          </p>
+          <div class="header-actions">
+            <button class="onboarding-btn" onclick="showOnboarding()">
+              <i class="fas fa-graduation-cap"></i> New BA? Start Here
+            </button>
+            <div id="user-menu" style="display: none;">
+              <button class="user-btn" onclick="showUserMenu()" id="user-menu-btn">
+                <i class="fas fa-user"></i> <span id="username-display"></span>
+              </button>
+              <div id="user-dropdown" class="user-dropdown" style="display: none;">
+                <a href="#" onclick="showUserManagement(); return false;" id="user-management-link" style="display: none;">
+                  <i class="fas fa-users-cog"></i> User Management
+                </a>
+                <a href="#" onclick="showProjectsScreen(); return false;" id="user-projects-link" style="display: none;">
+                  <i class="fas fa-folder-open"></i> Projects
+                </a>
+                <a href="#" onclick="logout(); return false;">
+                  <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Login/Register Screen -->
+      <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-header">
+              <img src="sv_dolphin_icon.png" alt="Logo" style="width: 60px; height: 60px; margin-bottom: 20px;">
+              <h2>Welcome to SonarVision</h2>
+              <p>Business Analysis Intelligence Platform</p>
+            </div>
+            
+            <div id="login-form" class="auth-form">
+              <h3>Login</h3>
+              <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                  <label for="login-username">Username or Email</label>
+                  <input type="text" id="login-username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="login-password">Password</label>
+                  <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">
+                  <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <p style="text-align: center; margin-top: 15px;">
+                  Don't have an account? 
+                  <a href="#" onclick="showRegisterForm(); return false;">Register here</a>
+                </p>
+              </form>
+              <div id="auth-error" class="error-message" style="display: none;"></div>
+            </div>
+            
+            <div id="register-form" class="auth-form" style="display: none;">
+              <h3>Create Account</h3>
+              <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                  <label for="register-username">Username</label>
+                  <input type="text" id="register-username" class="form-control" required minlength="3">
+                </div>
+                <div class="form-group">
+                  <label for="register-email">Email</label>
+                  <input type="email" id="register-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="register-password">Password</label>
+                  <input type="password" id="register-password" class="form-control" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">
+                  <i class="fas fa-user-plus"></i> Register
+                </button>
+                <p style="text-align: center; margin-top: 15px;">
+                  Already have an account? 
+                  <a href="#" onclick="showLoginForm(); return false;">Login here</a>
+                </p>
+              </form>
+              <div id="auth-error-register" class="error-message" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management Screen (Superuser only) -->
+      <div id="user-management-screen" class="screen">
+        <div class="content">
+          <div class="screen-header">
+            <h2><i class="fas fa-users-cog"></i> User Management</h2>
+            <button class="btn btn-secondary" onclick="returnToDashboard()">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+          </div>
+          
+          <div class="user-management-container">
+            <div class="user-actions">
+              <button class="btn btn-primary" onclick="showCreateUserModal()">
+                <i class="fas fa-user-plus"></i> Create New User
+              </button>
+            </div>
+            
+            <div class="users-table-container">
+              <table class="users-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Superuser</th>
+                    <th>Active</th>
+                    <th>Created</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 20px;">
+                      Loading users...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create/Edit User Modal -->
+      <div id="user-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modal-title">Create User</h3>
+            <button class="modal-close" onclick="closeUserModal()">&times;</button>
+          </div>
+          <form id="user-form" onsubmit="handleUserSubmit(event)">
+            <input type="hidden" id="edit-user-id">
+            <div class="form-group">
+              <label for="modal-username">Username</label>
+              <input type="text" id="modal-username" class="form-control" required minlength="3">
+            </div>
+            <div class="form-group">
+              <label for="modal-email">Email</label>
+              <input type="email" id="modal-email" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="modal-password">Password</label>
+              <input type="password" id="modal-password" class="form-control" minlength="6">
+              <small>Leave blank to keep existing password (edit mode only)</small>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="modal-superuser"> Superuser
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="modal-active" checked> Active
+              </label>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Phase Selection Screen -->
+      <div id="phase-selection" class="screen">
+        <div class="content">
+          <div class="phase-selection-header">
+            <div class="phase-selection-title">
+              <h2>Select Your Project Phase</h2>
+              <p>
+                Choose the phase you're currently working on to generate a
+                tailored prompt.
+              </p>
+            </div>
+            <button
+              class="settings-btn"
+              onclick="openSettingsDialog()"
+              title="Settings"
+            >
+              <i class="fas fa-cog"></i>
+            </button>
+          </div>
+
+          <div class="phase-collection">
+            <section class="phase-band phase-band--plan">
+              <div class="phase-band-header">
+                <h3>Plan & Align</h3>
+                <p>
+                  Frame the initiative, align stakeholders, and prioritize the work that matters.
+                </p>
+              </div>
+              <div class="phase-grid phase-grid--band">
+                <div
+                  class="phase-card end-to-end-process"
+                  data-phase="endToEndProcess"
+                >
+                  <div class="phase-icon">
+                    <i class="fas fa-route"></i>
+                  </div>
+                  <h3>End-to-End Process</h3>
+                  <p>
+                    Complete BA workflow from discovery to launch with guided
+                    validation and automatic phase transitions
+                  </p>
+                  <div class="process-badge">🚀 Automated Workflow</div>
+                </div>
+
+                <div class="phase-card" data-phase="discovery">
+                  <div class="phase-icon">
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <h3>Discovery</h3>
+                  <p>
+                    Project planning, stakeholder identification, and initial
+                    scope definition
+                  </p>
+                </div>
+
+                <div class="phase-card" data-phase="prioritization">
+                  <div class="phase-icon">
+                    <i class="fas fa-tasks"></i>
+                  </div>
+                  <h3>Epic Prioritization</h3>
+                  <p>
+                    Timeline-based epic prioritization with automatic roadblock
+                    detection and timeline adjustment
+                  </p>
+                  <div class="process-badge">📅 Smart Timeline</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="phase-band phase-band--design">
+              <div class="phase-band-header">
+                <h3>Design & Define</h3>
+                <p>
+                  Shape requirements, narratives, and experiences that bring the solution to life.
+                </p>
+              </div>
+              <div class="phase-grid phase-grid--band">
+                <div class="phase-card" data-phase="requirements">
+                  <div class="phase-icon">
+                    <i class="fas fa-list-check"></i>
+                  </div>
+                  <h3>Requirements</h3>
+                  <p>
+                    Functional requirements, user stories, and acceptance criteria
+                  </p>
+                </div>
+
+                <div class="phase-card" data-phase="stories">
+                  <div class="phase-icon">
+                    <i class="fas fa-tasks"></i>
+                  </div>
+                  <h3>User Stories</h3>
+                  <p>
+                    Detailed user stories, acceptance criteria, and story mapping
+                  </p>
+                </div>
+
+                <div class="phase-card" data-phase="wireframing">
+                  <div class="phase-icon">
+                    <i class="fas fa-pencil-ruler"></i>
+                  </div>
+                  <h3>Wireframing</h3>
+                  <p>UI/UX design, user flows, and interface mockups</p>
+                </div>
+
+                <div class="phase-card" data-phase="promptSynthesizer">
+                  <div class="phase-icon">
+                    <i class="fas fa-magic"></i>
+                  </div>
+                  <h3>Prompt Synthesizer</h3>
+                  <p>
+                    Generate the best meta-prompt for any BA phase using
+                    AI-powered prompt engineering
+                  </p>
+                  <div class="process-badge">🤖 AI-Powered</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="phase-band phase-band--deliver">
+              <div class="phase-band-header">
+                <h3>Deliver & Scale</h3>
+                <p>
+                  Execute confidently, guide adoption, and monitor program health in real time.
+                </p>
+              </div>
+              <div class="phase-grid phase-grid--band">
+                <div class="phase-card" data-phase="testing">
+                  <div class="phase-icon">
+                    <i class="fas fa-vial"></i>
+                  </div>
+                  <h3>Testing</h3>
+                  <p>Test planning, scenarios, and quality assurance</p>
+                </div>
+
+                <div class="phase-card" data-phase="launch">
+                  <div class="phase-icon">
+                    <i class="fas fa-rocket"></i>
+                  </div>
+                  <h3>Launch</h3>
+                  <p>Go-live planning, training, and communication</p>
+                </div>
+
+                <div class="phase-card" data-phase="enhancedTooltips">
+                  <div class="phase-icon">
+                    <i class="fas fa-lightbulb"></i>
+                  </div>
+                  <h3>User Guide Builder</h3>
+                  <p>Create comprehensive training materials and user guides</p>
+                </div>
+
+                <div class="phase-card" data-phase="jiraDashboard">
+                  <div class="phase-icon">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <h3>JIRA Analytics</h3>
+                  <p>
+                    Real-time analytics, ticket management, and reporting dashboard
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- Onboarding Screen -->
+      <div id="onboarding-screen" class="screen">
+        <div class="content">
+          <div class="onboarding-header">
+            <button class="back-btn" onclick="goBack()">
+              <i class="fas fa-arrow-left"></i> Back to Phases
+            </button>
+            <h2>
+              <i class="fas fa-graduation-cap"></i> Welcome to SonarVision
+            </h2>
+            <p class="onboarding-subtitle">
+              Your complete guide to Business Analysis
+            </p>
+          </div>
+
+          <div class="onboarding-content">
+            <!-- What is a Business Analyst Section -->
+            <div class="onboarding-section">
+              <h3>
+                <i class="fas fa-user-tie"></i> What is a Business Analyst?
+              </h3>
+              <div class="ba-explanation">
+                <p>
+                  A Business Analyst (BA) is a professional who acts as a bridge
+                  between business stakeholders and technical teams. Your
+                  primary goal is to:
+                </p>
+                <ul class="ba-goals">
+                  <li>
+                    <strong>Understand business needs</strong> - Identify what
+                    the business actually wants to achieve
+                  </li>
+                  <li>
+                    <strong>Analyze problems</strong> - Break down complex
+                    business challenges into manageable pieces
+                  </li>
+                  <li>
+                    <strong>Design solutions</strong> - Create clear, actionable
+                    plans that solve business problems
+                  </li>
+                  <li>
+                    <strong>Facilitate communication</strong> - Ensure everyone
+                    understands the requirements and solutions
+                  </li>
+                  <li>
+                    <strong>Manage change</strong> - Help organizations adapt to
+                    new processes and systems
+                  </li>
+                </ul>
+                <div class="ba-role-highlight">
+                  <p>
+                    <strong>Think of yourself as a translator:</strong> You take
+                    business language and translate it into technical
+                    requirements, and vice versa.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- How to Use SonarVision Section -->
+            <div class="onboarding-section">
+              <h3><i class="fas fa-rocket"></i> How to Use SonarVision</h3>
+              <div class="usage-guide">
+                <div class="step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h4>Choose Your Phase</h4>
+                    <p>
+                      Select the phase that matches where you are in your
+                      project. Don't worry if you're not sure - you can always
+                      go back and try a different phase.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h4>Fill Out the Form</h4>
+                    <p>
+                      Answer the questions about your project. The more detail
+                      you provide, the better your generated prompt will be.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h4>Generate Your Prompt</h4>
+                    <p>
+                      Click "Generate Prompt" to create a tailored prompt that
+                      you can use with any AI tool (ChatGPT, Claude, etc.).
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h4>Copy and Use</h4>
+                    <p>
+                      Copy the generated prompt and paste it into your preferred
+                      AI tool to get expert guidance for your specific
+                      situation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase Explanations Section -->
+            <div class="onboarding-section">
+              <h3><i class="fas fa-map"></i> Understanding Each Phase</h3>
+              <div class="phases-explanation">
+                <div class="phase-explanation" data-target-phase="discovery" role="button" tabindex="0" aria-label="Go to Discovery phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>Discovery</h4>
+                    <p>
+                      <strong>When to use:</strong> At the very beginning of a
+                      project
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Identify stakeholders,
+                      understand business objectives, define project scope, and
+                      gather initial requirements.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Project charter,
+                      stakeholder map, initial scope document
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="requirements" role="button" tabindex="0" aria-label="Go to Requirements phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-list-check"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>Requirements</h4>
+                    <p>
+                      <strong>When to use:</strong> After discovery, when you
+                      need to define what the system should do
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Document functional and
+                      non-functional requirements, create use cases, and
+                      establish acceptance criteria.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Requirements document, use
+                      cases, acceptance criteria
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="wireframing" role="button" tabindex="0" aria-label="Go to Wireframing phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-pencil-ruler"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>Wireframing</h4>
+                    <p>
+                      <strong>When to use:</strong> When you need to visualize
+                      the user interface
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Create wireframes, user
+                      flows, and interface mockups to show how users will
+                      interact with the system.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Wireframes, user flows,
+                      interface mockups
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="stories" role="button" tabindex="0" aria-label="Go to User Stories phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-tasks"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>User Stories</h4>
+                    <p>
+                      <strong>When to use:</strong> When breaking down
+                      requirements into development tasks
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Write user stories,
+                      define acceptance criteria, and create story maps for
+                      development teams.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> User stories, acceptance
+                      criteria, story map
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="testing" role="button" tabindex="0" aria-label="Go to Testing phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-vial"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>Testing</h4>
+                    <p>
+                      <strong>When to use:</strong> When preparing for system
+                      testing and quality assurance
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Create test plans, define
+                      test scenarios, and establish testing criteria.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Test plan, test scenarios,
+                      testing criteria
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="launch" role="button" tabindex="0" aria-label="Go to Launch phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-rocket"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>Launch</h4>
+                    <p>
+                      <strong>When to use:</strong> When preparing for system
+                      go-live
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Plan go-live activities,
+                      create training materials, and establish communication
+                      plans.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Go-live plan, training
+                      materials, communication plan
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation special" data-target-phase="endToEndProcess" role="button" tabindex="0" aria-label="Go to End-to-End Process phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-route"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>End-to-End Process</h4>
+                    <p>
+                      <strong>When to use:</strong> For complete projects from
+                      start to finish
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Follow a guided workflow
+                      through all phases with automatic transitions and
+                      validation.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Complete project
+                      documentation and deliverables
+                    </p>
+                    <div class="special-badge">🚀 Recommended for new BAs</div>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="enhancedTooltips" role="button" tabindex="0" aria-label="Go to User Guide Builder phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-lightbulb"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>User Guide Builder</h4>
+                    <p>
+                      <strong>When to use:</strong> When creating training
+                      materials and user documentation
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Generate comprehensive
+                      user guides, training materials, and documentation with
+                      customizable depth and format options.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Step-by-step guides, video
+                      scripts, troubleshooting guides, and quick reference
+                      materials
+                    </p>
+                  </div>
+                </div>
+
+                <div class="phase-explanation" data-target-phase="prioritization" role="button" tabindex="0" aria-label="Go to Epic Prioritization & Timeline Management phase">
+                  <div class="phase-icon-small">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <div class="phase-details">
+                    <h4>Epic Prioritization & Timeline Management</h4>
+                    <p>
+                      <strong>When to use:</strong> For large projects with
+                      multiple epics, when you need to balance business value
+                      with technical constraints
+                    </p>
+                    <p>
+                      <strong>What you'll do:</strong> Prioritize epics based on
+                      business value and technical feasibility, create
+                      timeline-based roadmaps, and automatically adjust
+                      schedules based on roadblocks and changes.
+                    </p>
+                    <p>
+                      <strong>Key outcomes:</strong> Prioritized epic roadmap,
+                      timeline adjustments, risk mitigation strategies, and
+                      visual project timeline
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pro Tips Section -->
+            <div class="onboarding-section">
+              <h3><i class="fas fa-lightbulb"></i> Pro Tips for New BAs</h3>
+              <div class="pro-tips">
+                <div class="tip">
+                  <i class="fas fa-comments"></i>
+                  <div class="tip-content">
+                    <h4>Ask Questions</h4>
+                    <p>
+                      Don't be afraid to ask "why" and "what if" questions. Your
+                      job is to understand the real business need, not just what
+                      people say they want.
+                    </p>
+                  </div>
+                </div>
+                <div class="tip">
+                  <i class="fas fa-users"></i>
+                  <div class="tip-content">
+                    <h4>Talk to Everyone</h4>
+                    <p>
+                      Interview stakeholders from different departments. Each
+                      person has a unique perspective on the business problem.
+                    </p>
+                  </div>
+                </div>
+                <div class="tip">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="tip-content">
+                    <h4>Document Everything</h4>
+                    <p>
+                      Write down assumptions, decisions, and rationale. You'll
+                      thank yourself later when questions arise.
+                    </p>
+                  </div>
+                </div>
+                <div class="tip">
+                  <i class="fas fa-check-circle"></i>
+                  <div class="tip-content">
+                    <h4>Validate Early and Often</h4>
+                    <p>
+                      Share your understanding with stakeholders regularly. It's
+                      easier to fix misunderstandings early than later.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Common BA Tools Section -->
+            <div class="onboarding-section">
+              <h3><i class="fas fa-tools"></i> Essential BA Software Tools</h3>
+              <div class="tools-grid">
+                <div class="tool-card" data-tool-url="https://www.atlassian.com/software/jira" role="link" tabindex="0" aria-label="Open Jira website">
+                  <div class="tool-icon">
+                    <i class="fab fa-jira"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Jira</h4>
+                    <p>
+                      <strong>What it is:</strong> Project management and issue
+                      tracking tool for agile development.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For managing user stories,
+                      tracking bugs, sprint planning, and project reporting.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Epic management, sprint
+                      boards, burndown charts, custom workflows, and team
+                      collaboration.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://www.figma.com/" role="link" tabindex="0" aria-label="Open Figma website">
+                  <div class="tool-icon">
+                    <i class="fab fa-figma"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Figma</h4>
+                    <p>
+                      <strong>What it is:</strong> Collaborative design tool for
+                      creating wireframes, prototypes, and user interfaces.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For wireframing, user flow
+                      mapping, UI mockups, and stakeholder presentations.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Real-time collaboration,
+                      prototyping, design systems, and developer handoff.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://www.atlassian.com/software/confluence" role="link" tabindex="0" aria-label="Open Confluence website">
+                  <div class="tool-icon">
+                    <i class="fab fa-confluence"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Confluence</h4>
+                    <p>
+                      <strong>What it is:</strong> Team workspace for
+                      documentation, knowledge sharing, and collaboration.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For requirements
+                      documentation, meeting notes, process documentation, and
+                      team wikis.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Rich text editing,
+                      templates, page trees, comments, and integration with
+                      Jira.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://www.microsoft.com/microsoft-365/visio/flowchart-software" role="link" tabindex="0" aria-label="Open Microsoft Visio website">
+                  <div class="tool-icon">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Microsoft Visio</h4>
+                    <p>
+                      <strong>What it is:</strong> Diagramming and vector
+                      graphics application for process mapping and flowcharts.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For business process
+                      mapping, system architecture diagrams, and organizational
+                      charts.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Process templates, data
+                      linking, collaboration tools, and professional
+                      diagramming.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://miro.com/" role="link" tabindex="0" aria-label="Open Miro website">
+                  <div class="tool-icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Miro</h4>
+                    <p>
+                      <strong>What it is:</strong> Online collaborative
+                      whiteboarding platform for visual collaboration.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For stakeholder workshops,
+                      user journey mapping, brainstorming sessions, and remote
+                      collaboration.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Infinite canvas, templates,
+                      real-time collaboration, voting, and presentation mode.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://www.lucidchart.com/" role="link" tabindex="0" aria-label="Open Lucidchart website">
+                  <div class="tool-icon">
+                    <i class="fas fa-database"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Lucidchart</h4>
+                    <p>
+                      <strong>What it is:</strong> Cloud-based diagramming tool
+                      for creating flowcharts, wireframes, and process maps.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For process documentation,
+                      system architecture, data flow diagrams, and stakeholder
+                      presentations.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Drag-and-drop interface,
+                      templates, collaboration, data linking, and integrations.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://www.zoom.us/" role="link" tabindex="0" aria-label="Open Zoom/Teams website">
+                  <div class="tool-icon">
+                    <i class="fas fa-video"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Zoom/Teams</h4>
+                    <p>
+                      <strong>What it is:</strong> Video conferencing and
+                      collaboration platforms for remote meetings and workshops.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For stakeholder interviews,
+                      requirements gathering sessions, and remote collaboration.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Screen sharing, breakout
+                      rooms, recording, whiteboarding, and integration with
+                      calendars.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://www.microsoft.com/microsoft-365/excel" role="link" tabindex="0" aria-label="Open Microsoft Excel website">
+                  <div class="tool-icon">
+                    <i class="fas fa-file-excel"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Microsoft Excel</h4>
+                    <p>
+                      <strong>What it is:</strong> Spreadsheet application for
+                      data analysis, requirements tracking, and reporting.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For requirements
+                      traceability matrices, stakeholder analysis, data
+                      analysis, and project reporting.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Pivot tables, formulas,
+                      data validation, charts, and collaboration features.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://slack.com/" role="link" tabindex="0" aria-label="Open Slack website">
+                  <div class="tool-icon">
+                    <i class="fas fa-comments"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Slack</h4>
+                    <p>
+                      <strong>What it is:</strong> Team communication platform
+                      for instant messaging and collaboration.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For daily team
+                      communication, quick questions, file sharing, and project
+                      updates.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Channels, direct messages,
+                      file sharing, integrations, and search functionality.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="tool-card" data-tool-url="https://trello.com/" role="link" tabindex="0" aria-label="Open Trello website">
+                  <div class="tool-icon">
+                    <i class="fas fa-tasks"></i>
+                  </div>
+                  <div class="tool-content">
+                    <h4>Trello</h4>
+                    <p>
+                      <strong>What it is:</strong> Visual project management
+                      tool using boards, lists, and cards.
+                    </p>
+                    <p>
+                      <strong>When to use:</strong> For lightweight project
+                      tracking, task management, and visual workflow
+                      organization.
+                    </p>
+                    <p>
+                      <strong>Key features:</strong> Kanban boards, checklists,
+                      due dates, labels, and team collaboration.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Getting Started CTA -->
+            <div class="onboarding-cta">
+              <h3>Ready to Get Started?</h3>
+              <p>
+                Choose a phase below to begin your first project, or try the
+                End-to-End Process for a guided experience.
+              </p>
+              <button class="btn btn-primary" onclick="goBack()">
+                <i class="fas fa-play"></i> Start Your First Project
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Screens -->
+      <div id="form-screen" class="screen">
+        <div class="content">
+          <div class="form-header">
+            <button class="back-btn" onclick="goBack()">
+              <i class="fas fa-arrow-left"></i> Back to Phases
+            </button>
+            <h2 id="form-title">Phase Form</h2>
+          </div>
+
+          <!-- Project/Feature selectors -->
+          <div class="project-bar-simple">
+            <div class="project-field-simple">
+              <label for="project-select">Project</label>
+              <select id="project-select" class="form-control" onchange="handleProjectSelectChange()">
+                <option value="">Ad-hoc (no project)</option>
+              </select>
+              <small id="project-context-hint" class="project-context-hint">Ad-hoc mode: form will not be saved to a project.</small>
+            </div>
+            <div class="project-field-simple">
+              <label for="feature-select">Feature (optional)</label>
+              <select id="feature-select" class="form-control" onchange="handleFeatureSelectChange()">
+                <option value="">None</option>
+              </select>
+            </div>
+            <div class="project-actions-simple">
+              <button class="btn btn-secondary btn-sm" onclick="prefillFromProject()">
+                <i class="fas fa-download"></i> Load into Form
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="openProjectManager()">
+                <i class="fas fa-folder-open"></i> Manage Projects
+              </button>
+            </div>
+          </div>
+
+          <form id="phase-form">
+            <div id="form-fields">
+              <!-- Dynamic form fields will be inserted here -->
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Generate Prompt
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Projects Screen -->
+      <div id="projects-screen" class="screen">
+        <div class="content">
+          <div class="projects-screen-header">
+            <button class="back-btn" onclick="showScreen('phase-selection')">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+            <div class="projects-screen-actions">
+              <h2>Projects</h2>
+              <div class="project-actions-simple">
+                <button class="btn btn-primary btn-sm" onclick="startNewProjectFlow()">
+                  <i class="fas fa-plus"></i> New Project
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="openProjectManager()">
+                  <i class="fas fa-folder-open"></i> Manage
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="projects-screen-list" class="projects-screen-grid"></div>
+        </div>
+      </div>
+
+      <!-- Prompt Generation Screen -->
+      <div id="prompt-screen" class="screen">
+        <div class="content">
+          <div class="prompt-header">
+            <button class="back-btn" onclick="goToForm()">
+              <i class="fas fa-arrow-left"></i> Back to Form
+            </button>
+            <h2>Generated Prompt</h2>
+          </div>
+
+          <div class="prompt-container">
+            <label class="result-label" for="generated-prompt">Edit before copying</label>
+            <textarea class="prompt-editor" id="generated-prompt" rows="12"></textarea>
+            <div class="prompt-actions">
+              <button class="btn btn-secondary" onclick="copyPrompt()">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+              </button>
+              <button class="btn btn-secondary" onclick="startNew()">
+                <i class="fas fa-plus"></i> Create New Prompt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prompt Synthesizer Screen -->
+      <div id="prompt-synthesizer-screen" class="screen">
+        <div class="content">
+          <div class="prompt-synthesizer-header">
+            <button class="back-btn" onclick="showScreen('phase-selection')">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+            <h2>Prompt Synthesizer</h2>
+            <p class="synthesizer-description">
+              Generate the best meta-prompt for Business Analyst phases using AI
+            </p>
+          </div>
+
+          <div class="synthesizer-form">
+            <div class="form-group">
+              <label for="phase-select">Select Phase:</label>
+              <select
+                id="phase-select"
+                class="form-control"
+                onchange="updateFormFields()"
+              >
+                <option value="">Choose a phase...</option>
+                <option value="discovery">Discovery</option>
+                <option value="requirements">Requirements</option>
+                <option value="wireframing">Wireframing</option>
+                <option value="stories">User Stories</option>
+                <option value="prioritization">Prioritization</option>
+                <option value="testing">Testing</option>
+                <option value="communication">Communication</option>
+              </select>
+            </div>
+
+            <div id="dynamic-form-fields">
+              <div class="form-group">
+                <label for="project-name">Project Name:</label>
+                <input
+                  type="text"
+                  id="project-name"
+                  class="form-control"
+                  placeholder="Enter project name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="stakeholders">Key Stakeholders:</label>
+                <textarea
+                  id="stakeholders"
+                  class="form-control"
+                  placeholder="List main stakeholders (comma-separated)"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="project-type">Project Type:</label>
+                <select id="project-type" class="form-control">
+                  <option value="">Select project type...</option>
+                  <option value="web application">Web Application</option>
+                  <option value="mobile app">Mobile App</option>
+                  <option value="desktop software">Desktop Software</option>
+                  <option value="API integration">API Integration</option>
+                  <option value="data migration">Data Migration</option>
+                  <option value="process improvement">
+                    Process Improvement
+                  </option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="timeline">Timeline:</label>
+                <input
+                  type="text"
+                  id="timeline"
+                  class="form-control"
+                  placeholder="e.g., 3 months, 6 weeks, 1 year"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="team-size">Team Size:</label>
+                <input
+                  type="number"
+                  id="team-size"
+                  class="form-control"
+                  placeholder="Number of team members"
+                  min="1"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="complexity">Project Complexity:</label>
+                <select id="complexity" class="form-control">
+                  <option value="">Select complexity...</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="very high">Very High</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="additional-context">Additional Context:</label>
+                <textarea
+                  id="additional-context"
+                  class="form-control"
+                  placeholder="Any additional information about the project, constraints, or special requirements"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                class="btn btn-primary"
+                id="generate-prompt-btn"
+                onclick="generateMetaPrompt()"
+                disabled
+              >
+                <i class="fas fa-lock"></i> Select Phase First
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="synthesizer-results"
+            class="synthesizer-results"
+            style="display: none"
+          >
+            <div class="results-header">
+              <h3>Generated Meta-Prompt</h3>
+            </div>
+
+            <div class="result-section">
+              <h4>Title</h4>
+              <div class="result-content" id="result-title"></div>
+            </div>
+
+            <div class="result-section" style="display: none">
+              <h4>System Prompt</h4>
+              <label class="result-label" for="result-system">Edit before copying</label>
+              <textarea class="result-editor" id="result-system" rows="6"></textarea>
+              <button
+                class="btn btn-secondary btn-sm copy-btn"
+                onclick="copyToClipboard('result-system')"
+              >
+                <i class="fas fa-copy"></i> Copy System
+              </button>
+            </div>
+
+            <div class="result-section" style="display: none">
+              <h4>User Prompt</h4>
+              <label class="result-label" for="result-user">Edit before copying</label>
+              <textarea class="result-editor" id="result-user" rows="8"></textarea>
+              <button
+                class="btn btn-secondary btn-sm copy-btn"
+                onclick="copyToClipboard('result-user')"
+              >
+                <i class="fas fa-copy"></i> Copy User
+              </button>
+            </div>
+
+            <div
+              class="result-section"
+              id="guardrails-section"
+              style="display: none"
+            >
+              <h4>Guardrails</h4>
+              <div class="result-content" id="result-guardrails"></div>
+            </div>
+
+            <div
+              class="result-section"
+              id="few-shots-section"
+              style="display: none"
+            >
+              <h4>Few-Shot Examples</h4>
+              <div class="result-content" id="result-few-shots"></div>
+            </div>
+
+            <div
+              class="result-section"
+              id="tools-section"
+              style="display: none"
+            >
+              <h4>Suggested Tools</h4>
+              <div class="result-content" id="result-tools"></div>
+            </div>
+
+            <div class="result-section" id="tags-section" style="display: none">
+              <h4>Telemetry Tags</h4>
+              <div class="result-content" id="result-tags"></div>
+            </div>
+
+            <div
+              class="result-section"
+              id="cohesive-section"
+              style="display: none"
+            >
+              <h4>Ready-to-Use Prompt</h4>
+              <label class="result-label" for="result-cohesive">Edit before copying</label>
+              <textarea class="result-editor" id="result-cohesive" rows="10"></textarea>
+              <button
+                class="btn btn-primary btn-sm copy-btn"
+                onclick="copyToClipboard('result-cohesive')"
+              >
+                <i class="fas fa-copy"></i> Copy Prompt
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="synthesizer-error"
+            class="error-message"
+            style="display: none"
+          >
+            <h4>Error</h4>
+            <div id="error-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+      <span id="toast-message"></span>
+    </div>
+
+    <!-- Project Manager Modal -->
+    <div id="project-modal" class="modal-overlay" style="display: none">
+      <div class="settings-modal project-manager-modal">
+        <div class="modal-header">
+          <h3><i class="fas fa-folder-open"></i> Projects</h3>
+          <button class="modal-close-btn" onclick="closeProjectManager()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="projects-layout-simple">
+            <div class="projects-editor-simple">
+              <div class="form-group">
+                <label for="project-name-input">Project name</label>
+                <input type="text" id="project-name-input" class="form-control" placeholder="e.g., Customer Portal Revamp" />
+              </div>
+              <div class="form-group">
+                <label for="project-description-input">Description</label>
+                <textarea id="project-description-input" class="form-control" rows="3" placeholder="High-level description"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="project-stakeholders-input">Key stakeholders (comma separated)</label>
+                <input type="text" id="project-stakeholders-input" class="form-control" placeholder="Names or roles" />
+              </div>
+              <div class="form-group">
+                <label for="project-team-input">Team members (name - role, comma separated)</label>
+                <input type="text" id="project-team-input" class="form-control" placeholder="Jane Doe - PO, Sam Wu - Eng" />
+              </div>
+              <div class="form-group">
+                <label for="project-roles-input">Default user roles (comma separated)</label>
+                <input type="text" id="project-roles-input" class="form-control" placeholder="Admin, Customer, Support Agent" />
+              </div>
+              <div class="form-group">
+                <label for="project-acstyle-input">Default acceptance criteria style</label>
+                <input type="text" id="project-acstyle-input" class="form-control" placeholder="Gherkin, bullet list, etc." />
+              </div>
+              <div class="form-group">
+                <label for="project-response-preview">Saved responses by phase/feature</label>
+                <div id="project-response-preview" class="response-preview"></div>
+              </div>
+              <div class="project-actions-simple">
+                <button class="btn btn-primary btn-sm" onclick="saveProject(); return false;">
+                  <i class="fas fa-save"></i> Save Project
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProject(); return false;">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+              <hr />
+              <h4>Features</h4>
+              <div class="form-group">
+                <label for="feature-name-input">Feature name</label>
+                <input type="text" id="feature-name-input" class="form-control" placeholder="e.g., Payments" />
+              </div>
+              <div class="form-group">
+                <label for="feature-size-input">T-shirt size</label>
+                <select id="feature-size-input" class="form-control">
+                  <option value="">Select size</option>
+                  <option value="Small">Small</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Large">Large</option>
+                  <option value="Extra Large">Extra Large</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="feature-desc-input">Feature description</label>
+                <textarea id="feature-desc-input" class="form-control" rows="2" placeholder="Short summary"></textarea>
+              </div>
+              <div class="project-actions-simple">
+                <button class="btn btn-secondary btn-sm" onclick="startNewFeature(); return false;">
+                  <i class="fas fa-plus"></i> New Feature
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="clearFeatureForm(); return false;">
+                  Clear Feature
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFeatureEntry(); return false;">
+                  Delete Feature
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="saveFeature(); return false;">
+                  <i class="fas fa-save"></i> Save Feature
+                </button>
+              </div>
+              <div id="features-list" class="projects-list-simple" style="margin-top:12px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestion Banner -->
+    <div id="project-suggestion-banner" class="suggestion-banner" style="display:none;">
+      <div class="suggestion-content">
+        <p id="suggestion-text">We found new project info. Save it?</p>
+        <div id="suggestion-list" class="suggestion-list"></div>
+        <div class="suggestion-actions">
+          <button class="btn btn-primary btn-sm" onclick="applySuggestions()">Save to Project</button>
+          <button class="btn btn-secondary btn-sm" onclick="dismissSuggestions()">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Dialog -->
+    <div id="settings-dialog" class="modal-overlay">
+      <div class="modal-content settings-modal">
+        <div class="modal-header">
+          <h3>
+            <i class="fas fa-cog"></i>
+            Settings
+          </h3>
+          <button class="modal-close-btn" onclick="closeSettingsDialog()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-section">
+            <h4>Appearance</h4>
+            <div class="settings-option">
+              <label class="toggle-container">
+                <input
+                  type="checkbox"
+                  id="dark-mode-toggle"
+                  onchange="toggleDarkMode()"
+                />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Enable Dark Mode</span>
+              </label>
+              <p class="settings-description">
+                Switch to a low-light theme that reduces glare and increases
+                contrast.
+              </p>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h4>Advanced Features</h4>
+            <div class="settings-option">
+              <label class="toggle-container">
+                <input
+                  type="checkbox"
+                  id="jira-analytics-toggle"
+                  onchange="toggleJiraAnalytics()"
+                />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Show JIRA Analytics</span>
+              </label>
+              <p class="settings-description">
+                Enable the JIRA Analytics phase for ticket management and
+                reporting.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeSettingsDialog()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js?v=4"></script>
+  </body>
+</html>
