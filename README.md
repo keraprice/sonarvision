@@ -372,8 +372,6 @@ The Meeting Recording Analysis activity now includes automatic video transcripti
 
 ### Privacy
 
-- All prompts and responses are sent to OpenAI's servers
-- Review OpenAI's privacy policy for data handling details
 - Consider using external AI tools for sensitive information
 
 ## 🤝 Contributing
@@ -386,9 +384,6 @@ This is a prototype, but suggestions for improvements are welcome:
 - UI/UX improvements
 - Additional AI model integrations
 
-## 📝 License
-
-This project is open source and available under the MIT License.
 
 ---
 
