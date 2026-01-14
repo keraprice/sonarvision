@@ -1,2 +1,10 @@
 # Local Netlify folder
 .netlify
+venv/
+.venv/
+__pycache__/
+*.pyc
+temp_uploads/
+audio-chunks/
+sonarvision.db
+.env

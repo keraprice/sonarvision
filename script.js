@@ -60,6 +60,111 @@ function getFormFieldsRoot() {
   );
 }
 
+function getSdlcStorageKey(projectId) {
+  const projectKey = projectId ? `project_${projectId}` : "adhoc";
+  return `sdlc_completion_${projectKey}`;
+}
+
+function loadSdlcCompletion(projectId) {
+  const raw = localStorage.getItem(getSdlcStorageKey(projectId));
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) || {};
+  } catch (_err) {
+    return {};
+  }
+}
+
+function saveSdlcCompletion(projectId, state) {
+  localStorage.setItem(getSdlcStorageKey(projectId), JSON.stringify(state));
+}
+
+function toggleSdlcModule(projectId, phaseKey) {
+  const state = loadSdlcCompletion(projectId);
+  state[phaseKey] = !state[phaseKey];
+  saveSdlcCompletion(projectId, state);
+  renderSdlcDashboard(projectId);
+}
+
+function renderSdlcDashboard(projectId) {
+  const list = document.getElementById("sdlc-dashboard-list");
+  const summary = document.getElementById("sdlc-progress-summary");
+  const title = document.getElementById("sdlc-dashboard-title");
+  if (!list || !summary) return;
+
+  const state = loadSdlcCompletion(projectId);
+  if (title) {
+    const proj = projectCache.find((p) => String(p.id) === String(projectId));
+    title.textContent = proj ? proj.name : "Project";
+  }
+  list.innerHTML = "";
+  let completedCount = 0;
+
+  SDLC_SEQUENCE.forEach((module) => {
+    const isDone = Boolean(state[module.key]);
+    if (isDone) completedCount += 1;
+
+    const item = document.createElement("div");
+    item.className = `sdlc-item${isDone ? " completed" : ""}`;
+
+    const header = document.createElement("div");
+    header.className = "sdlc-item-header";
+
+    const title = document.createElement("div");
+    title.className = "sdlc-item-title";
+    title.textContent = module.label;
+
+    const status = document.createElement("div");
+    status.className = "sdlc-status";
+    status.textContent = isDone ? "Completed" : "In progress";
+
+    header.appendChild(title);
+    header.appendChild(status);
+
+    const actions = document.createElement("div");
+    actions.className = "sdlc-item-actions";
+
+    const openBtn = document.createElement("button");
+    openBtn.className = "btn btn-secondary";
+    openBtn.type = "button";
+    openBtn.textContent = "Open";
+    openBtn.addEventListener("click", () => {
+      selectPhase(module.key);
+      closeSdlcDashboard();
+    });
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "btn btn-primary";
+    toggleBtn.type = "button";
+    toggleBtn.textContent = isDone ? "Mark Incomplete" : "Mark Complete";
+    toggleBtn.addEventListener("click", () => toggleSdlcModule(projectId, module.key));
+
+    actions.appendChild(openBtn);
+    actions.appendChild(toggleBtn);
+
+    item.appendChild(header);
+    item.appendChild(actions);
+    list.appendChild(item);
+  });
+
+  const pct = SDLC_SEQUENCE.length
+    ? Math.round((completedCount / SDLC_SEQUENCE.length) * 100)
+    : 0;
+  summary.textContent = `${pct}% complete`;
+}
+
+function openSdlcDashboard(projectId) {
+  const modal = document.getElementById("sdlc-dashboard-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  renderSdlcDashboard(projectId);
+}
+
+function closeSdlcDashboard() {
+  const modal = document.getElementById("sdlc-dashboard-modal");
+  if (modal) modal.style.display = "none";
+}
+
 // Merge static semantic map with any semantic hints found on the rendered form
 function buildSemanticMap(phaseKey) {
   const merged = { ...(FIELD_SEMANTIC_MAP[phaseKey] || {}) };
@@ -125,6 +230,23 @@ const API_ENDPOINTS = {
   transcribe: "http://localhost:5001/transcribe",
   auth: "http://localhost:5001/api/auth",
 };
+
+const SDLC_SEQUENCE = [
+  { key: "initiation", label: "Initiation" },
+  { key: "planning", label: "Planning" },
+  { key: "discovery", label: "Discovery" },
+  { key: "governance", label: "Governance" },
+  { key: "requirements", label: "Requirements" },
+  { key: "architecture", label: "Architecture" },
+  { key: "stories", label: "User Stories" },
+  { key: "wireframing", label: "Wireframing" },
+  { key: "development", label: "Development" },
+  { key: "testing", label: "Testing" },
+  { key: "release", label: "Release" },
+  { key: "launch", label: "Launch" },
+  { key: "operations", label: "Operations" },
+  { key: "postImplementation", label: "Post-Implementation" },
+];
 
 function getApiEndpoint(key) {
   const endpoint = API_ENDPOINTS[key];
@@ -216,6 +338,177 @@ Please help me create a comprehensive discovery phase analysis that includes:
    - Definition of Done for each phase
 
 Please provide specific, actionable recommendations with realistic timelines and clear next steps that I can use to guide the project planning process.`,
+  },
+  initiation: {
+    title: "Initiation Phase",
+    fields: [
+      {
+        name: "projectName",
+        label: "Project / Initiative Name",
+        type: "text",
+        placeholder: "e.g., Grid Optimization Portal Revamp",
+        required: true,
+      },
+      {
+        name: "problemStatement",
+        label: "Problem Statement",
+        type: "textarea",
+        placeholder: "What business problem are we solving?",
+        required: true,
+      },
+      {
+        name: "businessObjectives",
+        label: "Business Objectives",
+        type: "textarea",
+        placeholder: "Desired outcomes and goals",
+        required: true,
+      },
+      {
+        name: "successMetrics",
+        label: "Success Metrics",
+        type: "textarea",
+        placeholder: "How will success be measured?",
+        required: false,
+      },
+      {
+        name: "scopeIn",
+        label: "In Scope",
+        type: "textarea",
+        placeholder: "What is included in this initiative?",
+        required: false,
+      },
+      {
+        name: "scopeOut",
+        label: "Out of Scope",
+        type: "textarea",
+        placeholder: "What is explicitly excluded?",
+        required: false,
+      },
+      {
+        name: "keyStakeholders",
+        label: "Key Stakeholders",
+        type: "textarea",
+        placeholder: "Decision makers and sponsors",
+        required: false,
+      },
+    ],
+    promptTemplate: `I need an initiation brief for the following initiative:
+
+Project: {projectName}
+Problem statement: {problemStatement}
+Business objectives: {businessObjectives}
+Success metrics: {successMetrics}
+In scope: {scopeIn}
+Out of scope: {scopeOut}
+Key stakeholders: {keyStakeholders}
+
+Please provide a concise initiation summary, risks, assumptions, and recommended next steps.`,
+  },
+  planning: {
+    title: "Planning Phase",
+    fields: [
+      {
+        name: "projectName",
+        label: "Project Name",
+        type: "text",
+        placeholder: "Project name",
+        required: true,
+      },
+      {
+        name: "milestones",
+        label: "Key Milestones",
+        type: "textarea",
+        placeholder: "List major milestones and dates",
+        required: true,
+      },
+      {
+        name: "timeline",
+        label: "Target Timeline",
+        type: "text",
+        placeholder: "e.g., Q2 launch, 16-week plan",
+        required: false,
+      },
+      {
+        name: "risks",
+        label: "Risks & Mitigations",
+        type: "textarea",
+        placeholder: "Top risks and mitigation ideas",
+        required: false,
+      },
+      {
+        name: "dependencies",
+        label: "Dependencies",
+        type: "textarea",
+        placeholder: "People, systems, vendors, approvals",
+        required: false,
+      },
+      {
+        name: "resources",
+        label: "Resourcing Plan",
+        type: "textarea",
+        placeholder: "Teams, roles, and capacity",
+        required: false,
+      },
+    ],
+    promptTemplate: `Create a delivery plan for:
+
+Project: {projectName}
+Milestones: {milestones}
+Timeline: {timeline}
+Risks: {risks}
+Dependencies: {dependencies}
+Resourcing: {resources}
+
+Return a structured plan with phases, critical path, and recommended checkpoints.`,
+  },
+  governance: {
+    title: "Governance Phase",
+    fields: [
+      {
+        name: "projectName",
+        label: "Project Name",
+        type: "text",
+        placeholder: "Project name",
+        required: true,
+      },
+      {
+        name: "compliance",
+        label: "Compliance & Regulatory Needs",
+        type: "textarea",
+        placeholder: "Policies, regulations, audits",
+        required: false,
+      },
+      {
+        name: "approvals",
+        label: "Approval Workflow",
+        type: "textarea",
+        placeholder: "Who approves what, and when?",
+        required: false,
+      },
+      {
+        name: "changeControl",
+        label: "Change Control Process",
+        type: "textarea",
+        placeholder: "How scope and changes are managed",
+        required: false,
+      },
+      {
+        name: "security",
+        label: "Security & Privacy Considerations",
+        type: "textarea",
+        placeholder: "Data handling, access, privacy needs",
+        required: false,
+      },
+    ],
+    promptTemplate: `Define governance for:
+
+Project: {projectName}
+Compliance: {compliance}
+Approvals: {approvals}
+Change control: {changeControl}
+Security & privacy: {security}
+
+Provide a governance plan with decision points, artifacts, and audit steps.`,
   },
 
   requirements: {
@@ -628,6 +921,56 @@ For each screen in {keyScreens}, create:
 Generate clean, professional designs optimized for {wireframeTool} that can be directly implemented for maximum accuracy and usability.`,
   },
 
+  architecture: {
+    title: "Architecture Phase",
+    fields: [
+      {
+        name: "systemOverview",
+        label: "System Overview",
+        type: "textarea",
+        placeholder: "Brief summary of the solution and context",
+        required: true,
+      },
+      {
+        name: "integrations",
+        label: "Integrations & Interfaces",
+        type: "textarea",
+        placeholder: "APIs, upstream/downstream systems, data feeds",
+        required: false,
+      },
+      {
+        name: "dataEntities",
+        label: "Key Data Entities",
+        type: "textarea",
+        placeholder: "Core data objects and ownership",
+        required: false,
+      },
+      {
+        name: "nonFunctional",
+        label: "Non-Functional Requirements",
+        type: "textarea",
+        placeholder: "Performance, security, availability, compliance",
+        required: false,
+      },
+      {
+        name: "constraints",
+        label: "Constraints & Assumptions",
+        type: "textarea",
+        placeholder: "Tech stack limits, deadlines, dependencies",
+        required: false,
+      },
+    ],
+    promptTemplate: `Create a high-level architecture outline based on:
+
+System overview: {systemOverview}
+Integrations: {integrations}
+Key data entities: {dataEntities}
+Non-functional requirements: {nonFunctional}
+Constraints: {constraints}
+
+Provide a context diagram, major components, data flows, and key risks.`,
+  },
+
   stories: {
     title: "User Stories Phase",
     fields: [
@@ -925,6 +1268,174 @@ Please help me create a comprehensive launch strategy by providing:
     - Success stories and case study development
 
 Please provide specific, actionable guidance with templates, checklists, and examples that will help me ensure a successful launch and smooth transition to business-as-usual operations.`,
+  },
+
+  development: {
+    title: "Development Phase",
+    fields: [
+      {
+        name: "backlogReadiness",
+        label: "Backlog Readiness",
+        type: "textarea",
+        placeholder: "Are stories refined, sized, and prioritized?",
+        required: true,
+      },
+      {
+        name: "sprintCadence",
+        label: "Sprint Cadence",
+        type: "text",
+        placeholder: "e.g., 2-week sprints",
+        required: false,
+      },
+      {
+        name: "environments",
+        label: "Development Environments",
+        type: "textarea",
+        placeholder: "Dev/QA/Staging setup details",
+        required: false,
+      },
+      {
+        name: "definitionOfDone",
+        label: "Definition of Done",
+        type: "textarea",
+        placeholder: "Quality bars and completion criteria",
+        required: false,
+      },
+      {
+        name: "dependencies",
+        label: "Dependencies & Risks",
+        type: "textarea",
+        placeholder: "External dependencies and delivery risks",
+        required: false,
+      },
+    ],
+    promptTemplate: `Create a development readiness checklist for:
+
+Backlog readiness: {backlogReadiness}
+Sprint cadence: {sprintCadence}
+Environments: {environments}
+Definition of done: {definitionOfDone}
+Dependencies: {dependencies}
+
+Return a checklist and recommended sprint kickoff plan.`,
+  },
+
+  release: {
+    title: "Release Phase",
+    fields: [
+      {
+        name: "releaseScope",
+        label: "Release Scope",
+        type: "textarea",
+        placeholder: "What is included in this release?",
+        required: true,
+      },
+      {
+        name: "cutoverSteps",
+        label: "Cutover Steps",
+        type: "textarea",
+        placeholder: "Key steps and run order",
+        required: false,
+      },
+      {
+        name: "rollbackPlan",
+        label: "Rollback Plan",
+        type: "textarea",
+        placeholder: "How to revert safely if issues arise",
+        required: false,
+      },
+      {
+        name: "releaseChecklist",
+        label: "Release Checklist",
+        type: "textarea",
+        placeholder: "Readiness checks and approvals",
+        required: false,
+      },
+    ],
+    promptTemplate: `Build a release plan based on:
+
+Release scope: {releaseScope}
+Cutover steps: {cutoverSteps}
+Rollback plan: {rollbackPlan}
+Checklist: {releaseChecklist}
+
+Provide a release checklist, timeline, and go/no-go criteria.`,
+  },
+
+  operations: {
+    title: "Operations Phase",
+    fields: [
+      {
+        name: "monitoring",
+        label: "Monitoring & Alerts",
+        type: "textarea",
+        placeholder: "Metrics, dashboards, alert thresholds",
+        required: false,
+      },
+      {
+        name: "supportModel",
+        label: "Support Model",
+        type: "textarea",
+        placeholder: "Tiered support, escalation paths",
+        required: false,
+      },
+      {
+        name: "slas",
+        label: "SLAs / SLOs",
+        type: "textarea",
+        placeholder: "Targets for availability and response times",
+        required: false,
+      },
+      {
+        name: "runbooks",
+        label: "Runbooks",
+        type: "textarea",
+        placeholder: "Operational procedures and playbooks",
+        required: false,
+      },
+    ],
+    promptTemplate: `Create an operations handoff plan using:
+
+Monitoring: {monitoring}
+Support model: {supportModel}
+SLAs: {slas}
+Runbooks: {runbooks}
+
+Provide monitoring coverage, support workflows, and escalation guidance.`,
+  },
+
+  postImplementation: {
+    title: "Post-Implementation Phase",
+    fields: [
+      {
+        name: "outcomes",
+        label: "Outcomes & Metrics",
+        type: "textarea",
+        placeholder: "What changed and how will it be measured?",
+        required: true,
+      },
+      {
+        name: "lessonsLearned",
+        label: "Lessons Learned",
+        type: "textarea",
+        placeholder: "What went well, what to improve",
+        required: false,
+      },
+      {
+        name: "followUps",
+        label: "Follow-up Actions",
+        type: "textarea",
+        placeholder: "Backlog items, enhancements, or fixes",
+        required: false,
+      },
+    ],
+    promptTemplate: `Summarize the post-implementation review:
+
+Outcomes: {outcomes}
+Lessons learned: {lessonsLearned}
+Follow-up actions: {followUps}
+
+Provide a retrospective summary and improvement plan.`,
   },
 
   jiraDashboard: {
@@ -4922,6 +5433,14 @@ function renderProjectsOverview() {
     const actions = document.createElement("div");
     actions.className = "project-actions-simple";
 
+    const sdlcBtn = document.createElement("button");
+    sdlcBtn.className = "btn btn-secondary btn-sm";
+    sdlcBtn.textContent = "SDLC";
+    sdlcBtn.onclick = () => {
+      setActiveProject(p.id);
+      openSdlcDashboard(p.id);
+    };
+
     const manageBtn = document.createElement("button");
     manageBtn.className = "btn btn-primary btn-sm";
     manageBtn.textContent = "Manage";
@@ -4938,6 +5457,7 @@ function renderProjectsOverview() {
       selectPhase("discovery");
     };
 
+    actions.appendChild(sdlcBtn);
     actions.appendChild(manageBtn);
     actions.appendChild(discoveryBtn);
 

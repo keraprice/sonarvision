@@ -253,6 +253,26 @@
                   <div class="process-badge">🚀 Automated Workflow</div>
                 </div>
 
+                <div class="phase-card" data-phase="initiation">
+                  <div class="phase-icon">
+                    <i class="fas fa-flag-checkered"></i>
+                  </div>
+                  <h3>Initiation</h3>
+                  <p>
+                    Business case, objectives, scope framing, and success criteria
+                  </p>
+                </div>
+
+                <div class="phase-card" data-phase="planning">
+                  <div class="phase-icon">
+                    <i class="fas fa-calendar-check"></i>
+                  </div>
+                  <h3>Planning</h3>
+                  <p>
+                    Roadmap, milestones, risk plan, and delivery approach
+                  </p>
+                </div>
+
                 <div class="phase-card" data-phase="discovery">
                   <div class="phase-icon">
                     <i class="fas fa-search"></i>
@@ -275,6 +295,16 @@
                   </p>
                   <div class="process-badge">📅 Smart Timeline</div>
                 </div>
+
+                <div class="phase-card" data-phase="governance">
+                  <div class="phase-icon">
+                    <i class="fas fa-shield"></i>
+                  </div>
+                  <h3>Governance</h3>
+                  <p>
+                    Compliance, approvals, change control, and audit readiness
+                  </p>
+                </div>
               </div>
             </section>
 
@@ -293,6 +323,16 @@
                   <h3>Requirements</h3>
                   <p>
                     Functional requirements, user stories, and acceptance criteria
+                  </p>
+                </div>
+
+                <div class="phase-card" data-phase="architecture">
+                  <div class="phase-icon">
+                    <i class="fas fa-diagram-project"></i>
+                  </div>
+                  <h3>Architecture</h3>
+                  <p>
+                    System design, integrations, data flows, and constraints
                   </p>
                 </div>
 
@@ -336,6 +376,14 @@
                 </p>
               </div>
               <div class="phase-grid phase-grid--band">
+                <div class="phase-card" data-phase="development">
+                  <div class="phase-icon">
+                    <i class="fas fa-code"></i>
+                  </div>
+                  <h3>Development</h3>
+                  <p>Backlog readiness, sprint planning, and delivery guardrails</p>
+                </div>
+
                 <div class="phase-card" data-phase="testing">
                   <div class="phase-icon">
                     <i class="fas fa-vial"></i>
@@ -344,12 +392,36 @@
                   <p>Test planning, scenarios, and quality assurance</p>
                 </div>
 
+                <div class="phase-card" data-phase="release">
+                  <div class="phase-icon">
+                    <i class="fas fa-truck-fast"></i>
+                  </div>
+                  <h3>Release</h3>
+                  <p>Release readiness, cutover steps, and rollback plans</p>
+                </div>
+
                 <div class="phase-card" data-phase="launch">
                   <div class="phase-icon">
                     <i class="fas fa-rocket"></i>
                   </div>
                   <h3>Launch</h3>
                   <p>Go-live planning, training, and communication</p>
+                </div>
+
+                <div class="phase-card" data-phase="operations">
+                  <div class="phase-icon">
+                    <i class="fas fa-headset"></i>
+                  </div>
+                  <h3>Operations</h3>
+                  <p>Runbooks, monitoring, support workflows, and SLAs</p>
+                </div>
+
+                <div class="phase-card" data-phase="postImplementation">
+                  <div class="phase-icon">
+                    <i class="fas fa-clipboard-check"></i>
+                  </div>
+                  <h3>Post-Implementation</h3>
+                  <p>Benefits tracking, retro, and continuous improvements</p>
                 </div>
 
                 <div class="phase-card" data-phase="enhancedTooltips">
@@ -1050,6 +1122,28 @@
         </div>
       </div>
 
+      <!-- SDLC Dashboard Modal -->
+      <div id="sdlc-dashboard-modal" class="modal-overlay" style="display: none;">
+        <div class="settings-modal sdlc-dashboard-modal">
+          <div class="modal-header">
+            <h3><i class="fas fa-diagram-project"></i> SDLC Dashboard</h3>
+            <button class="modal-close-btn" onclick="closeSdlcDashboard()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="sdlc-dashboard-header">
+              <div>
+                <h4 id="sdlc-dashboard-title">Project</h4>
+                <p>Track completion across the full delivery lifecycle.</p>
+              </div>
+              <div class="sdlc-progress" id="sdlc-progress-summary">0% complete</div>
+            </div>
+            <div id="sdlc-dashboard-list" class="sdlc-dashboard-list"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Prompt Generation Screen -->
       <div id="prompt-screen" class="screen">
         <div class="content">
@@ -1098,12 +1192,20 @@
               >
                 <option value="">Choose a phase...</option>
                 <option value="discovery">Discovery</option>
+                <option value="initiation">Initiation</option>
+                <option value="planning">Planning</option>
+                <option value="governance">Governance</option>
                 <option value="requirements">Requirements</option>
+                <option value="architecture">Architecture</option>
                 <option value="wireframing">Wireframing</option>
                 <option value="stories">User Stories</option>
                 <option value="prioritization">Prioritization</option>
+                <option value="development">Development</option>
                 <option value="testing">Testing</option>
+                <option value="release">Release</option>
                 <option value="communication">Communication</option>
+                <option value="operations">Operations</option>
+                <option value="postImplementation">Post-Implementation</option>
               </select>
             </div>
 
