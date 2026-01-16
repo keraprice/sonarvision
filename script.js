@@ -173,6 +173,7 @@ function buildSemanticMap(phaseKey) {
 
   const semanticEls = formFields.querySelectorAll("[data-entity][data-path]");
   semanticEls.forEach((el) => {
+    if (!el || !el.dataset) return;
     const name = el.id || el.name;
     if (!name) return;
     merged[name] = {
@@ -244,7 +245,6 @@ const SDLC_SEQUENCE = [
   { key: "testing", label: "Testing" },
   { key: "release", label: "Release" },
   { key: "launch", label: "Launch" },
-  { key: "operations", label: "Operations" },
   { key: "postImplementation", label: "Post-Implementation" },
 ];
 
@@ -422,6 +422,20 @@ Please provide a concise initiation summary, risks, assumptions, and recommended
         required: true,
       },
       {
+        name: "projectDescription",
+        label: "Brief Description",
+        type: "textarea",
+        placeholder: "Short summary of the scope and goals",
+        required: false,
+      },
+      {
+        name: "tShirtSize",
+        label: "T-Shirt Size",
+        type: "select",
+        options: ["XS", "S", "M", "L", "XL", "XXL"],
+        required: false,
+      },
+      {
         name: "timeline",
         label: "Target Timeline",
         type: "text",
@@ -443,10 +457,11 @@ Please provide a concise initiation summary, risks, assumptions, and recommended
         required: false,
       },
       {
-        name: "resources",
-        label: "Resourcing Plan",
+        name: "capacityResourcing",
+        label: "Capacity & Resourcing",
         type: "textarea",
-        placeholder: "Teams, roles, and capacity",
+        placeholder:
+          "Teams, roles, capacity, velocity, and availability assumptions (e.g., Dev 4 @ 70%, QA 2 @ 50%, 30 pts/sprint, 10% meetings)",
         required: false,
       },
     ],
@@ -454,12 +469,17 @@ Please provide a concise initiation summary, risks, assumptions, and recommended
 
 Project: {projectName}
 Milestones: {milestones}
+Brief description: {projectDescription}
+T-shirt size: {tShirtSize}
 Timeline: {timeline}
 Risks: {risks}
 Dependencies: {dependencies}
-Resourcing: {resources}
+Capacity & resourcing: {capacityResourcing}
 
-Return a structured plan with phases, critical path, and recommended checkpoints.`,
+Return a structured plan with phases, critical path, and recommended checkpoints.
+Include a capacity-based delivery forecast, highlight work that can be done in tandem,
+and call out any sequencing constraints or bottlenecks. Assess whether the target
+timeline is attainable given the size and capacity, and recommend adjustments if not.`,
   },
   governance: {
     title: "Governance Phase",
@@ -1320,6 +1340,249 @@ Dependencies: {dependencies}
 Return a checklist and recommended sprint kickoff plan.`,
   },
 
+  devStorySubtasks: {
+    title: "Dev Story to Subtasks",
+    fields: [
+      {
+        name: "storyTitle",
+        label: "Story Title",
+        type: "text",
+        placeholder: "e.g., User can reset password",
+        required: true,
+      },
+      {
+        name: "storyDescription",
+        label: "Story Description",
+        type: "textarea",
+        placeholder: "As a... I want... So that... (or a brief summary)",
+        required: true,
+      },
+      {
+        name: "acceptanceCriteria",
+        label: "Acceptance Criteria",
+        type: "textarea",
+        placeholder: "List the acceptance criteria",
+        required: false,
+      },
+      {
+        name: "nonFunctional",
+        label: "Non-Functional Requirements",
+        type: "textarea",
+        placeholder: "Performance, security, accessibility, etc.",
+        required: false,
+      },
+      {
+        name: "dependencies",
+        label: "Dependencies / Constraints",
+        type: "textarea",
+        placeholder: "Upstream systems, approvals, data migrations, blockers",
+        required: false,
+      },
+      {
+        name: "estimateFormat",
+        label: "Estimate Format",
+        type: "select",
+        options: ["Story points", "Hours", "Days", "No estimates"],
+        required: false,
+      },
+      {
+        name: "includeTestingTasks",
+        label: "Include Testing Tasks?",
+        type: "select",
+        options: ["Yes", "No"],
+        required: false,
+      },
+      {
+        name: "outputFormat",
+        label: "Output Format",
+        type: "select",
+        options: ["Task list", "Table", "Checklist with subtasks"],
+        required: false,
+      },
+    ],
+    promptTemplate: `Break the following story into development tasks and subtasks.
+
+Story title: {storyTitle}
+Story description: {storyDescription}
+Acceptance criteria: {acceptanceCriteria}
+Non-functional requirements: {nonFunctional}
+Dependencies/constraints: {dependencies}
+Estimate format: {estimateFormat}
+Include testing tasks: {includeTestingTasks}
+Output format: {outputFormat}
+
+Provide a clear task breakdown with sequencing/dependencies, what can run in parallel,
+and any risks or unknowns. If estimates are requested, include them per task.`,
+  },
+
+  devStoryTesting: {
+    title: "Dev Story to Testing",
+    fields: [
+      {
+        name: "storyTitle",
+        label: "Story Title",
+        type: "text",
+        placeholder: "e.g., User can reset password",
+        required: true,
+      },
+      {
+        name: "storyDescription",
+        label: "Story Description",
+        type: "textarea",
+        placeholder: "As a... I want... So that... (or a brief summary)",
+        required: true,
+      },
+      {
+        name: "acceptanceCriteria",
+        label: "Acceptance Criteria",
+        type: "textarea",
+        placeholder: "List the acceptance criteria",
+        required: false,
+      },
+      {
+        name: "nonFunctional",
+        label: "Non-Functional Requirements",
+        type: "textarea",
+        placeholder: "Performance, security, accessibility, etc.",
+        required: false,
+      },
+      {
+        name: "riskAreas",
+        label: "Risk Areas / Edge Cases",
+        type: "textarea",
+        placeholder: "Known edge cases, integrations, or high-risk paths",
+        required: false,
+      },
+      {
+        name: "testDepth",
+        label: "Test Depth",
+        type: "select",
+        options: ["Smoke", "Functional", "Regression", "Full coverage"],
+        required: false,
+      },
+      {
+        name: "testFormat",
+        label: "Test Output Format",
+        type: "select",
+        options: ["Test cases", "Scenarios", "Checklist"],
+        required: false,
+      },
+      {
+        name: "includeAutomation",
+        label: "Include Automation Suggestions?",
+        type: "select",
+        options: ["Yes", "No"],
+        required: false,
+      },
+    ],
+    promptTemplate: `Generate testing guidance from this development story.
+
+Story title: {storyTitle}
+Story description: {storyDescription}
+Acceptance criteria: {acceptanceCriteria}
+Non-functional requirements: {nonFunctional}
+Risk areas / edge cases: {riskAreas}
+Test depth: {testDepth}
+Output format: {testFormat}
+Include automation suggestions: {includeAutomation}
+
+Provide a structured QA plan that includes test cases or scenarios, negative paths,
+data/setup needs, and traceability back to acceptance criteria.`,
+  },
+
+  technicalDocumentation: {
+    title: "Technical Documentation",
+    fields: [
+      {
+        name: "projectName",
+        label: "Project Name",
+        type: "text",
+        placeholder: "Project name",
+        required: true,
+      },
+      {
+        name: "projectSummary",
+        label: "Project Summary",
+        type: "textarea",
+        placeholder: "Brief overview of the product or system",
+        required: false,
+      },
+      {
+        name: "architectureOverview",
+        label: "Architecture Overview",
+        type: "textarea",
+        placeholder: "Key components, services, and data flows",
+        required: false,
+      },
+      {
+        name: "architectureDiagramNotes",
+        label: "Architecture Diagram Notes",
+        type: "textarea",
+        placeholder: "Describe the diagram you want (context, containers, integrations)",
+        required: false,
+      },
+      {
+        name: "techStack",
+        label: "Tech Stack",
+        type: "textarea",
+        placeholder: "Frontend, backend, data stores, infra, CI/CD",
+        required: false,
+      },
+      {
+        name: "epicSummary",
+        label: "Epic / Feature Summary",
+        type: "textarea",
+        placeholder: "Major epics/features to document and align to components",
+        required: false,
+      },
+      {
+        name: "nonFunctional",
+        label: "Non-Functional Requirements",
+        type: "textarea",
+        placeholder: "Performance, security, availability, compliance",
+        required: false,
+      },
+      {
+        name: "environments",
+        label: "Environments & Release Notes",
+        type: "textarea",
+        placeholder: "Dev/QA/Prod details, release cadence, deployment notes",
+        required: false,
+      },
+      {
+        name: "outputFormat",
+        label: "Output Format",
+        type: "select",
+        options: [
+          "Confluence (Markdown)",
+          "Confluence (Storage/HTML)",
+          "Markdown",
+          "Plain text",
+        ],
+        required: true,
+      },
+    ],
+    promptTemplate: `Create technical documentation for the following system in the requested format.
+
+Project: {projectName}
+Summary: {projectSummary}
+Architecture overview: {architectureOverview}
+Architecture diagram notes: {architectureDiagramNotes}
+Tech stack: {techStack}
+Epics/features: {epicSummary}
+Non-functional requirements: {nonFunctional}
+Environments/release notes: {environments}
+Output format: {outputFormat}
+
+Include:
+1) Architecture overview and component list
+2) A clear architecture diagram description (textual)
+3) Tech stack table
+4) Epic/feature mapping to components and risks
+5) Operational notes (envs, monitoring, runbooks)
+Format the entire output in the chosen {outputFormat}.`,
+  },
+
   release: {
     title: "Release Phase",
     fields: [
@@ -1360,48 +1623,6 @@ Rollback plan: {rollbackPlan}
 Checklist: {releaseChecklist}
 
 Provide a release checklist, timeline, and go/no-go criteria.`,
-  },
-
-  operations: {
-    title: "Operations Phase",
-    fields: [
-      {
-        name: "monitoring",
-        label: "Monitoring & Alerts",
-        type: "textarea",
-        placeholder: "Metrics, dashboards, alert thresholds",
-        required: false,
-      },
-      {
-        name: "supportModel",
-        label: "Support Model",
-        type: "textarea",
-        placeholder: "Tiered support, escalation paths",
-        required: false,
-      },
-      {
-        name: "slas",
-        label: "SLAs / SLOs",
-        type: "textarea",
-        placeholder: "Targets for availability and response times",
-        required: false,
-      },
-      {
-        name: "runbooks",
-        label: "Runbooks",
-        type: "textarea",
-        placeholder: "Operational procedures and playbooks",
-        required: false,
-      },
-    ],
-    promptTemplate: `Create an operations handoff plan using:
-
-Monitoring: {monitoring}
-Support model: {supportModel}
-SLAs: {slas}
-Runbooks: {runbooks}
-
-Provide monitoring coverage, support workflows, and escalation guidance.`,
   },
 
   postImplementation: {
@@ -1961,6 +2182,7 @@ Please provide specific recommendations based on the application design (if atta
   },
 };
 
+
 // Initialize the application
 document.addEventListener("DOMContentLoaded", function () {
   initializeApp();
@@ -1994,7 +2216,38 @@ function initializeApp() {
   initializeDarkMode();
   initializeOnboardingPhaseLinks();
   initializeToolLinks();
+  initializeRoleFilter();
   loadProjects();
+}
+
+function initializeRoleFilter() {
+  const roleSelect = document.getElementById("role-filter");
+  if (!roleSelect) return;
+  roleSelect.addEventListener("change", applyRoleFilter);
+  applyRoleFilter();
+}
+
+function applyRoleFilter() {
+  const roleSelect = document.getElementById("role-filter");
+  const selectedRole = roleSelect ? roleSelect.value : "all";
+  const cards = document.querySelectorAll(".phase-card[data-roles]");
+
+  cards.forEach((card) => {
+    const roles = (card.dataset.roles || "")
+      .split(",")
+      .map((role) => role.trim())
+      .filter(Boolean);
+    const show = selectedRole === "all" || roles.includes(selectedRole);
+    card.style.display = show ? "" : "none";
+  });
+
+  document.querySelectorAll(".phase-band").forEach((band) => {
+    const bandCards = band.querySelectorAll(".phase-card");
+    const hasVisible = Array.from(bandCards).some(
+      (card) => card.style.display !== "none"
+    );
+    band.style.display = hasVisible ? "" : "none";
+  });
 }
 
 function initializeDarkMode() {
@@ -3335,7 +3588,10 @@ function runGeneratePrompt() {
     // Replace placeholders
     Object.keys(formData).forEach((key) => {
       const placeholder = `{{${key}}}`;
-      const value = formData[key] || "Not specified";
+      let value = formData[key] || "Not specified";
+      if (value instanceof File) {
+        value = value.name || "Uploaded file";
+      }
       prompt = prompt.replace(new RegExp(placeholder, "g"), value);
     });
   } else {
@@ -3344,6 +3600,9 @@ function runGeneratePrompt() {
     Object.keys(formData).forEach((key) => {
       const placeholder = `{${key}}`;
       let value = formData[key] || "Not specified";
+      if (value instanceof File) {
+        value = value.name || "Uploaded file";
+      }
 
       // Special handling for prioritization phase
       if (currentPhase === "prioritization") {
@@ -3662,10 +3921,19 @@ function showScreen(screenId) {
     onboardingBtn.style.display =
       screenId === "onboarding-screen" ? "none" : "inline-flex";
   }
+  const sdlcBtn = document.querySelector(".sdlc-btn");
+  if (sdlcBtn) {
+    sdlcBtn.style.display =
+      screenId === "sdlc-intro-screen" ? "none" : "inline-flex";
+  }
 }
 
 function showOnboarding() {
   showScreen("onboarding-screen");
+}
+
+function showSdlcIntro() {
+  showScreen("sdlc-intro-screen");
 }
 
 function goBack() {

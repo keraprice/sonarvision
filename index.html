@@ -44,6 +44,9 @@
             <button class="onboarding-btn" onclick="showOnboarding()">
               <i class="fas fa-graduation-cap"></i> New BA? Start Here
             </button>
+            <button class="sdlc-btn" onclick="showSdlcIntro()">
+              <i class="fas fa-diagram-project"></i> New to SDLC? Start Here
+            </button>
             <div id="user-menu" style="display: none;">
               <button class="user-btn" onclick="showUserMenu()" id="user-menu-btn">
                 <i class="fas fa-user"></i> <span id="username-display"></span>
@@ -228,6 +231,17 @@
               <i class="fas fa-cog"></i>
             </button>
           </div>
+          <div class="phase-filter">
+            <label for="role-filter">Filter by role:</label>
+            <select id="role-filter" class="form-control" onchange="applyRoleFilter()">
+              <option value="all">All roles</option>
+              <option value="ba">Business Analyst</option>
+              <option value="product">Product Manager</option>
+              <option value="pm">Project/Program Manager</option>
+              <option value="dev">Developer</option>
+              <option value="qa">QA/Testing</option>
+            </select>
+          </div>
 
           <div class="phase-collection">
             <section class="phase-band phase-band--plan">
@@ -241,6 +255,7 @@
                 <div
                   class="phase-card end-to-end-process"
                   data-phase="endToEndProcess"
+                  data-roles="ba,pm"
                 >
                   <div class="phase-icon">
                     <i class="fas fa-route"></i>
@@ -253,7 +268,7 @@
                   <div class="process-badge">🚀 Automated Workflow</div>
                 </div>
 
-                <div class="phase-card" data-phase="initiation">
+                <div class="phase-card" data-phase="initiation" data-roles="ba,pm">
                   <div class="phase-icon">
                     <i class="fas fa-flag-checkered"></i>
                   </div>
@@ -263,7 +278,7 @@
                   </p>
                 </div>
 
-                <div class="phase-card" data-phase="planning">
+                <div class="phase-card" data-phase="planning" data-roles="ba,pm">
                   <div class="phase-icon">
                     <i class="fas fa-calendar-check"></i>
                   </div>
@@ -273,7 +288,7 @@
                   </p>
                 </div>
 
-                <div class="phase-card" data-phase="discovery">
+                <div class="phase-card" data-phase="discovery" data-roles="ba">
                   <div class="phase-icon">
                     <i class="fas fa-search"></i>
                   </div>
@@ -284,7 +299,7 @@
                   </p>
                 </div>
 
-                <div class="phase-card" data-phase="prioritization">
+                <div class="phase-card" data-phase="prioritization" data-roles="ba,product,pm">
                   <div class="phase-icon">
                     <i class="fas fa-tasks"></i>
                   </div>
@@ -296,7 +311,7 @@
                   <div class="process-badge">📅 Smart Timeline</div>
                 </div>
 
-                <div class="phase-card" data-phase="governance">
+                <div class="phase-card" data-phase="governance" data-roles="ba,pm">
                   <div class="phase-icon">
                     <i class="fas fa-shield"></i>
                   </div>
@@ -316,7 +331,7 @@
                 </p>
               </div>
               <div class="phase-grid phase-grid--band">
-                <div class="phase-card" data-phase="requirements">
+                <div class="phase-card" data-phase="requirements" data-roles="ba,product">
                   <div class="phase-icon">
                     <i class="fas fa-list-check"></i>
                   </div>
@@ -326,7 +341,7 @@
                   </p>
                 </div>
 
-                <div class="phase-card" data-phase="architecture">
+                <div class="phase-card" data-phase="architecture" data-roles="architect,dev">
                   <div class="phase-icon">
                     <i class="fas fa-diagram-project"></i>
                   </div>
@@ -336,7 +351,7 @@
                   </p>
                 </div>
 
-                <div class="phase-card" data-phase="stories">
+                <div class="phase-card" data-phase="stories" data-roles="ba,product">
                   <div class="phase-icon">
                     <i class="fas fa-tasks"></i>
                   </div>
@@ -346,7 +361,7 @@
                   </p>
                 </div>
 
-                <div class="phase-card" data-phase="wireframing">
+                <div class="phase-card" data-phase="wireframing" data-roles="ba">
                   <div class="phase-icon">
                     <i class="fas fa-pencil-ruler"></i>
                   </div>
@@ -354,7 +369,7 @@
                   <p>UI/UX design, user flows, and interface mockups</p>
                 </div>
 
-                <div class="phase-card" data-phase="promptSynthesizer">
+                <div class="phase-card" data-phase="promptSynthesizer" data-roles="ba,pm,product">
                   <div class="phase-icon">
                     <i class="fas fa-magic"></i>
                   </div>
@@ -376,7 +391,7 @@
                 </p>
               </div>
               <div class="phase-grid phase-grid--band">
-                <div class="phase-card" data-phase="development">
+                <div class="phase-card" data-phase="development" data-roles="dev,pm">
                   <div class="phase-icon">
                     <i class="fas fa-code"></i>
                   </div>
@@ -384,7 +399,31 @@
                   <p>Backlog readiness, sprint planning, and delivery guardrails</p>
                 </div>
 
-                <div class="phase-card" data-phase="testing">
+                <div class="phase-card" data-phase="devStorySubtasks" data-roles="dev,pm">
+                  <div class="phase-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                  </div>
+                  <h3>Dev Story to Subtasks</h3>
+                  <p>Break stories into implementation tasks, dependencies, and estimates</p>
+                </div>
+
+                <div class="phase-card" data-phase="devStoryTesting" data-roles="qa,dev">
+                  <div class="phase-icon">
+                    <i class="fas fa-bug"></i>
+                  </div>
+                  <h3>Dev Story to Testing</h3>
+                  <p>Generate test cases, scenarios, and QA coverage from a story</p>
+                </div>
+
+                <div class="phase-card" data-phase="technicalDocumentation" data-roles="architect,dev,ops">
+                  <div class="phase-icon">
+                    <i class="fas fa-sitemap"></i>
+                  </div>
+                  <h3>Technical Documentation</h3>
+                  <p>Architecture overview, tech stack, and epic alignment with export-ready formatting</p>
+                </div>
+
+                <div class="phase-card" data-phase="testing" data-roles="qa,dev">
                   <div class="phase-icon">
                     <i class="fas fa-vial"></i>
                   </div>
@@ -392,7 +431,7 @@
                   <p>Test planning, scenarios, and quality assurance</p>
                 </div>
 
-                <div class="phase-card" data-phase="release">
+                <div class="phase-card" data-phase="release" data-roles="ops,pm,dev">
                   <div class="phase-icon">
                     <i class="fas fa-truck-fast"></i>
                   </div>
@@ -400,7 +439,7 @@
                   <p>Release readiness, cutover steps, and rollback plans</p>
                 </div>
 
-                <div class="phase-card" data-phase="launch">
+                <div class="phase-card" data-phase="launch" data-roles="pm,ops">
                   <div class="phase-icon">
                     <i class="fas fa-rocket"></i>
                   </div>
@@ -408,15 +447,7 @@
                   <p>Go-live planning, training, and communication</p>
                 </div>
 
-                <div class="phase-card" data-phase="operations">
-                  <div class="phase-icon">
-                    <i class="fas fa-headset"></i>
-                  </div>
-                  <h3>Operations</h3>
-                  <p>Runbooks, monitoring, support workflows, and SLAs</p>
-                </div>
-
-                <div class="phase-card" data-phase="postImplementation">
+                <div class="phase-card" data-phase="postImplementation" data-roles="ba,pm">
                   <div class="phase-icon">
                     <i class="fas fa-clipboard-check"></i>
                   </div>
@@ -424,7 +455,7 @@
                   <p>Benefits tracking, retro, and continuous improvements</p>
                 </div>
 
-                <div class="phase-card" data-phase="enhancedTooltips">
+                <div class="phase-card" data-phase="enhancedTooltips" data-roles="ba">
                   <div class="phase-icon">
                     <i class="fas fa-lightbulb"></i>
                   </div>
@@ -432,7 +463,7 @@
                   <p>Create comprehensive training materials and user guides</p>
                 </div>
 
-                <div class="phase-card" data-phase="jiraDashboard">
+                <div class="phase-card" data-phase="jiraDashboard" data-roles="pm,ops,dev">
                   <div class="phase-icon">
                     <i class="fas fa-chart-line"></i>
                   </div>
@@ -1053,6 +1084,92 @@
         </div>
       </div>
 
+      <!-- SDLC Intro Screen -->
+      <div id="sdlc-intro-screen" class="screen">
+        <div class="content">
+          <div class="onboarding-header">
+            <button class="back-btn" onclick="goBack()">
+              <i class="fas fa-arrow-left"></i> Back to Phases
+            </button>
+            <h2>
+              <i class="fas fa-diagram-project"></i> SDLC Starter Guide
+            </h2>
+            <p class="onboarding-subtitle">
+              Learn the lifecycle and how SonarVision supports each step
+            </p>
+          </div>
+
+          <div class="onboarding-content">
+            <div class="onboarding-section">
+              <h3><i class="fas fa-road"></i> What is the SDLC?</h3>
+              <p>
+                The Software Development Life Cycle (SDLC) is a structured path
+                from idea to release. It clarifies what should happen, when it
+                should happen, and who should be involved.
+              </p>
+              <ul class="ba-goals">
+                <li><strong>Initiation</strong> - Define the problem and value.</li>
+                <li><strong>Planning</strong> - Set timelines, risks, and capacity.</li>
+                <li><strong>Discovery</strong> - Capture stakeholders and scope.</li>
+                <li><strong>Requirements</strong> - Define what to build.</li>
+                <li><strong>Design</strong> - Validate flows and experiences.</li>
+                <li><strong>Development</strong> - Build with clear guardrails.</li>
+                <li><strong>Testing</strong> - Verify quality and readiness.</li>
+                <li><strong>Release</strong> - Ship safely and coordinate launch.</li>
+                <li><strong>Post-Implementation</strong> - Measure outcomes.</li>
+              </ul>
+            </div>
+
+            <div class="onboarding-section">
+              <h3><i class="fas fa-compass"></i> How SonarVision Helps</h3>
+              <p>
+                Each module in SonarVision generates a focused prompt, checklist,
+                or artifact so you can move forward with clarity and consistency.
+              </p>
+              <div class="ba-role-highlight">
+                <p>
+                  <strong>Tip:</strong> Start with Planning and Discovery, then
+                  move into Requirements, Stories, and Development modules.
+                </p>
+              </div>
+            </div>
+
+            <div class="onboarding-section">
+              <h3><i class="fas fa-list-check"></i> Recommended Flow</h3>
+              <div class="usage-guide">
+                <div class="step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h4>Pick your phase</h4>
+                    <p>Select the module that matches where your project is today.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h4>Fill what you know</h4>
+                    <p>Provide just enough detail to guide the prompt output.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h4>Generate and iterate</h4>
+                    <p>Use the output as a draft, refine, and save back to the project.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="onboarding-cta">
+              <button class="btn btn-primary" onclick="showScreen('phase-selection')">
+                <i class="fas fa-play"></i> Start with a Phase
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Form Screens -->
       <div id="form-screen" class="screen">
         <div class="content">
@@ -1201,10 +1318,12 @@
                 <option value="stories">User Stories</option>
                 <option value="prioritization">Prioritization</option>
                 <option value="development">Development</option>
+                <option value="devStorySubtasks">Dev Story to Subtasks</option>
+                <option value="devStoryTesting">Dev Story to Testing</option>
+                <option value="technicalDocumentation">Technical Documentation</option>
                 <option value="testing">Testing</option>
                 <option value="release">Release</option>
                 <option value="communication">Communication</option>
-                <option value="operations">Operations</option>
                 <option value="postImplementation">Post-Implementation</option>
               </select>
             </div>
@@ -1579,6 +1698,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=9"></script>
   </body>
 </html>

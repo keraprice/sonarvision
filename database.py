@@ -7,7 +7,8 @@ import secrets
 from datetime import datetime, timedelta
 from pathlib import Path
 
-DB_PATH = 'sonarvision.db'
+# Always store the DB alongside this module to avoid cwd-dependent lookups.
+DB_PATH = str(Path(__file__).resolve().parent / 'sonarvision.db')
 
 def init_database():
     """Initialize the database with user tables"""
